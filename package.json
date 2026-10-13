@@ -1,8 +1,57 @@
 {
-  "name": "intelligence-document-studio",
+  "name": "intelligence-ui",
   "version": "0.1.0",
-  "private": true,
+  "description": "Local interactive document SDK and studio with persistent decisions, verified code references and pluggable AI",
+  "license": "UNLICENSED",
   "type": "module",
-  "scripts": { "dev": "node --watch server.mjs", "start": "node server.mjs", "test": "node --test" },
-  "engines": { "node": ">=22" }
+  "main": "./index.mjs",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.mjs",
+      "default": "./index.mjs"
+    },
+    "./document": {
+      "types": "./types/document.d.ts",
+      "import": "./lib/document.mjs",
+      "default": "./lib/document.mjs"
+    }
+  },
+  "bin": {
+    "intelligence-ui": "./bin/studio.mjs"
+  },
+  "files": [
+    "index.mjs",
+    "index.d.ts",
+    "types/",
+    "lib/",
+    "bin/",
+    "public/",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/haowei2000/intelligence-ui.git"
+  },
+  "keywords": [
+    "interactive-document",
+    "ai",
+    "code-review",
+    "document-studio"
+  ],
+  "scripts": {
+    "dev": "node --watch bin/studio.mjs",
+    "start": "node bin/studio.mjs",
+    "test": "node --test test/*.test.mjs",
+    "check:types": "tsc -p tsconfig.types.json",
+    "prepack": "npm run check:types && npm test"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "typescript": "^7.0.2"
+  }
 }
