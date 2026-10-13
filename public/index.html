@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Document Studio · 交互文档工作台</title><link rel="stylesheet" href="/styles.css"><script src="/app.js" type="module"></script></head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="/"><span class="brand-mark">◧</span><span>Document<br><strong>Studio</strong></span></a>
+    <div class="workspace-label">工作空间 <span class="live-dot"></span></div>
+    <button id="new-document" class="new-button"><span>＋</span> 新建交互文档</button>
+    <div class="list-heading">我的文档 <span id="document-count">0</span></div>
+    <nav id="document-list" aria-label="文档列表"></nav>
+    <button id="import-document" class="quiet-button">↥ 导入 HTML / JSON</button>
+    <input type="file" id="import-file" accept=".html,.json" hidden>
+    <div class="sidebar-bottom"><div class="workspace-icon">⌘</div><div><strong>本地工作区</strong><span id="workspace-name"></span></div></div>
+  </aside>
+  <div class="main-shell">
+    <header class="topbar"><div class="breadcrumb">工作空间 <span>/</span> <strong id="breadcrumb-title">交互文档</strong></div><div class="top-actions"><span id="save-status" class="sr-only" role="status"></span><button id="export-document" class="secondary">导出文档 ↗</button></div></header>
+    <main>
+      <div class="workspace-grid">
+        <section class="document-pane" aria-label="文档预览">
+          <div class="pane-toolbar"><div class="tab active">交互文档</div><div class="document-meta"><span id="revision">v1</span><span class="separator"></span><span id="selection-count">0 项选择</span></div></div>
+          <iframe id="document-frame" title="可交互文档" sandbox="allow-scripts"></iframe>
+          <div class="document-footer"><button id="reload-document" class="text-button">重新加载</button></div>
+        </section>
+        <aside class="inspector">
+          <div class="inspector-header"><h2>决策与依据</h2><span class="small-mark">⌖</span></div>
+          <section class="inspection-section"><div class="section-title"><h3>当前选择</h3><span id="decision-progress">0 / 3</span></div><div id="selection-list"></div></section>
+          <section class="inspection-section"><div class="section-title"><h3>代码引用</h3><button id="add-reference" class="text-button">＋ 关联</button></div><div id="references"></div></section>
+          <section class="analysis-section"><div class="section-title"><h3>分析结果</h3><span id="analysis-kind" class="pill">本地检查</span></div><div id="analysis-content" class="analysis-content"></div><button id="analyze" class="primary wide">检查所选方案 <span>↗</span></button></section>
+          <section id="update-section" class="update-section"><h3>更新文档</h3><label class="sr-only" for="update-prompt">文档更新要求</label><textarea id="update-prompt"></textarea><button id="regenerate" class="secondary wide">用 AI 更新文档</button></section>
+        </aside>
+      </div>
+    </main>
+  </div>
+  <div id="toast" role="alert" hidden></div>
+  <dialog id="new-dialog"><form id="new-form"><div class="dialog-heading"><h2>新建交互文档</h2><button type="button" class="close" data-close>×</button></div><label for="new-title">文档标题</label><input id="new-title" required maxlength="200"><label for="new-description">文档说明</label><textarea id="new-description" maxlength="10000"></textarea><button class="primary wide" type="submit">创建文档</button></form></dialog>
+  <dialog id="reference-dialog"><form id="reference-form"><div class="dialog-heading"><h2>关联代码依据</h2><button type="button" class="close" data-close>×</button></div><label for="reference-decision">关联决策</label><select id="reference-decision"></select><label for="reference-path">工作区相对路径</label><input id="reference-path" required><div class="line-inputs"><div><label for="reference-start">起始行</label><input type="number" id="reference-start" min="1" value="1" required></div><div><label for="reference-end">结束行</label><input type="number" id="reference-end" min="1" value="100" required></div></div><button type="submit" class="primary wide">校验并关联</button></form></dialog>
+  <dialog id="code-dialog" class="code-dialog"><div class="dialog-heading"><h2 id="code-title">代码依据</h2><button class="close" data-close>×</button></div><p id="code-status"></p><pre id="code-content"></pre></dialog>
+</body></html>
