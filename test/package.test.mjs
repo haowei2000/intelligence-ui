@@ -6,14 +6,14 @@ import { mkdtemp, readdir, symlink } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { startStudio, createStudio, createDocument } from 'intelligence-ui';
+import { startStudio, createStudio, createDocument } from 'intelligence-ui/node';
 import { renderDocument } from 'intelligence-ui/document';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 
 test('importing the package does not start a server or write to the working directory', async () => {
   const cwd = await mkdtemp(path.join(os.tmpdir(), 'studio-import-'));
-  const result = spawnSync(process.execPath, ['--input-type=module', '-e', `const sdk = await import(${JSON.stringify(new URL('../index.mjs', import.meta.url).href)}); console.log(typeof sdk.startStudio)`], { cwd, encoding: 'utf8', timeout: 5000 });
+  const result = spawnSync(process.execPath, ['--input-type=module', '-e', `const sdk = await import(${JSON.stringify(new URL('../index.mjs', import.meta.url).href)}); console.log(typeof sdk.mountDocument)`], { cwd, encoding: 'utf8', timeout: 5000 });
   assert.equal(result.status, 0, result.stderr);
   assert.equal(result.stdout.trim(), 'function');
   assert.deepEqual(await readdir(cwd), []);
@@ -98,5 +98,5 @@ test('CLI runs through the executable symlink used by npm', async () => {
   await symlink(path.join(root, 'bin', 'studio.mjs'), link);
   const result = spawnSync(process.execPath, [link, '--version'], { cwd, encoding: 'utf8', timeout: 5000 });
   assert.equal(result.status, 0, result.stderr);
-  assert.equal(result.stdout.trim(), '0.1.0');
+  assert.equal(result.stdout.trim(), '0.2.0');
 });

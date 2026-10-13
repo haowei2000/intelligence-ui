@@ -12,6 +12,7 @@ export interface Decision {
 export interface DocumentState {
   selections: Record<string, string>;
   notes: string;
+  values?: Record<string, string | number | boolean | null | string[]>;
 }
 export interface CodeReference {
   decisionId: string;
@@ -53,15 +54,23 @@ export interface InteractiveDocument {
   references: CodeReference[];
   analysis: Analysis[];
   archivedSelections?: Array<{ decisionId: string; optionId: string; archivedAt: string }>;
-  ui: { html: string };
+  ui: { html: string; css?: string };
 }
 
+export interface CreateDocumentOptions {
+  title: string;
+  description?: string;
+  html?: string;
+  css?: string;
+  decisions?: Decision[];
+  state?: DocumentState;
+}
 export function createDocument(title?: string, description?: string): InteractiveDocument;
+export function createDocument(options: CreateDocumentOptions): InteractiveDocument;
 /** Validates the protocol and returns the same document. Throws on invalid data. */
 export function validateDocument(document: unknown): InteractiveDocument;
 /** Renders an isolated preview, or a portable HTML file when standalone is true. */
 export function renderDocument(document: InteractiveDocument, standalone?: boolean): string;
 /** Preserves still-valid selections and archives removed selections. Does not save. */
 export function mergeDocument(current: InteractiveDocument, next: InteractiveDocument): InteractiveDocument;
-export function hash(text: string): string;
 export function escapeHtml(text: unknown): string;

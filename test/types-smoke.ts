@@ -1,4 +1,4 @@
-import { createDocument, startStudio, createStudio, DocumentStore, readReference, createChatCompletionProvider, type InteractiveDocument } from 'intelligence-ui';
+import { createDocument, startStudio, createStudio, DocumentStore, readReference, createChatCompletionProvider, type InteractiveDocument } from 'intelligence-ui/node';
 import { renderDocument } from 'intelligence-ui/document';
 
 const doc: InteractiveDocument = createDocument('架构决策', '背景');
