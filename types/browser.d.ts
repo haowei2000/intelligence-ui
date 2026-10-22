@@ -32,8 +32,8 @@ export interface RendererOptions extends RendererSettings {
 export interface DocumentController {
   element: HTMLDivElement;
   getDocument(): InteractiveDocument;
-  /** Programmatic updates do not trigger onChange or onSave. */
-  update(document: InteractiveDocument, settings?: RendererSettings): void;
+  /** Programmatic updates do not trigger onChange or onSave. Pass undefined to change only settings. */
+  update(document: InteractiveDocument | undefined, settings?: RendererSettings): void;
   /** Writes all pending changes; rejects on save failure, allowing explicit retry. */
   flush(): Promise<InteractiveDocument>;
   /** Cancels scheduled saves and signals any in-flight save to abort. */
