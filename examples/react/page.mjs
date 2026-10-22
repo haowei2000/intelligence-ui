@@ -1,4 +1,4 @@
-import { createDocument } from 'intelligence-ui';
+import { createDocument } from '@haowei2000/intelligence-ui';
 
 export const initialDocument = createDocument({
   title: '项目设置',

@@ -19,13 +19,19 @@ function safeMarkup(html, ownerDocument) {
   return template.content;
 }
 
+// Custom CSS must not fetch: url()/@import/image-set() would load from the host origin and can leak field values via attribute selectors.
+function safeCss(text) {
+  const decoded = text.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\\([0-9a-fA-F]{1,6})\s?|\\([\s\S])/g, (_, hex, char) => hex ? String.fromCodePoint(Math.min(parseInt(hex, 16), 0x10ffff) || 0xfffd) : char);
+  return /@import|(?:url|image|image-set|src|cross-fade|element)\s*\(/i.test(decoded) ? undefined : text;
+}
+
 /** Mounts a document inside a scoped Shadow DOM. Persistence belongs to the caller. */
 export function mountDocument(container, initialOptions) {
   if (!container?.ownerDocument || typeof container.append !== 'function') throw new TypeError('container must be a DOM element');
   let options = { debounceMs: 300, ...initialOptions };
   if (!Number.isFinite(options.debounceMs) || options.debounceMs < 0) throw new TypeError('debounceMs must be nonnegative');
   let current = structuredClone(validateDocument(options.document));
-  let destroyed = false, pending = false, timer, saving, activeSave, epoch = 0, changeId = 0, layoutKey;
+  let destroyed = false, pending = false, timer, saving, activeSave, epoch = 0, changeId = 0, layoutKey, layoutParts, notesVisible = false, lastEmitted;
   const host = container.ownerDocument.createElement('div');
   const shadow = host.attachShadow({ mode: 'open' });
   const originalDisabled = new WeakMap();
@@ -63,11 +69,16 @@ export function mountDocument(container, initialOptions) {
     }
   }
   function render() {
-    const showNotes = current.decisions.length > 0 || Boolean(current.state.notes);
-    const key = JSON.stringify([current.title, current.description, current.decisions, current.ui, showNotes]);
+    // Once shown, the notes box stays until the document is replaced, so clearing notes never removes the focused textarea.
+    notesVisible ||= current.decisions.length > 0 || Boolean(current.state.notes);
+    const parts = [current.title, current.description, current.decisions, current.ui, notesVisible];
+    const key = layoutParts && parts.every((part, i) => part === layoutParts[i]) ? layoutKey : JSON.stringify(parts);
+    layoutParts = parts;
     if (key !== layoutKey) {
       layoutKey = key;
-      const style = container.ownerDocument.createElement('style'); style.textContent = css + '\n' + (current.ui.css || ''); if (options.styleNonce) style.nonce = options.styleNonce;
+      const customCss = current.ui.css ? safeCss(current.ui.css) : '';
+      if (customCss === undefined) report(new Error('ui.css contains url(), @import or other external resource references and was not applied'));
+      const style = container.ownerDocument.createElement('style'); style.textContent = css + '\n' + (customCss || ''); if (options.styleNonce) style.nonce = options.styleNonce;
       const main = container.ownerDocument.createElement('main');
       const template = container.ownerDocument.createElement('template');
       template.innerHTML = `<header><h1>${escapeHtml(current.title)}</h1>${current.description ? `<p>${escapeHtml(current.description)}</p>` : ''}</header>`;
@@ -78,7 +89,7 @@ export function mountDocument(container, initialOptions) {
         template.innerHTML = `<section><h2>${escapeHtml(decision.title)}</h2>${decision.description ? `<p>${escapeHtml(decision.description)}</p>` : ''}<div class="options">${decision.options.map(option => `<button type="button" class="option" data-decision="${escapeHtml(decision.id)}" data-option="${escapeHtml(option.id)}" aria-pressed="false"><span class="radio" aria-hidden="true"></span><span><strong>${escapeHtml(option.label)}</strong>${option.description ? `<small>${escapeHtml(option.description)}</small>` : ''}</span></button>`).join('')}</div></section>`;
         main.append(template.content);
       }
-      if (showNotes) {
+      if (notesVisible) {
         const section = container.ownerDocument.createElement('section'); section.innerHTML = '<h2>决策备注</h2><textarea data-notes aria-label="决策备注"></textarea>'; main.append(section);
       }
       shadow.replaceChildren(style, main);
@@ -91,12 +102,13 @@ export function mountDocument(container, initialOptions) {
     if (options.onSave && pending && !destroyed) timer = setTimeout(() => flush().catch(() => {}), options.debounceMs);
   }
   function change(state, context) {
-    const next = validateDocument({ ...current, state });
     if (JSON.stringify(current.state) === JSON.stringify(state)) return;
-    current = structuredClone(next); changeId++; pending = Boolean(options.onSave);
+    // Only state changes here; the rest of current is owned by the renderer and kept by reference.
+    current = validateDocument({ ...current, state: structuredClone(state) }); changeId++; pending = true;
     syncControls();
-    notify(options.onChange, snapshot(), { ...context, changeId });
-    if (pending) status('pending');
+    lastEmitted = snapshot();
+    notify(options.onChange, lastEmitted, { ...context, changeId });
+    if (options.onSave) status('pending');
     schedule();
   }
   function click(event) {
@@ -148,7 +160,8 @@ export function mountDocument(container, initialOptions) {
             current = sequence === changeId ? structuredClone(saved) : { ...current, manifest: structuredClone(saved.manifest) };
             render();
             // Echo server metadata to controlled hosts without scheduling a save.
-            notify(options.onChange, snapshot(), { type: 'saved', changeId });
+            lastEmitted = snapshot();
+            notify(options.onChange, lastEmitted, { type: 'saved', changeId });
           }
           notify(options.onSaved, structuredClone(saved || document));
           status(pending ? 'pending' : 'saved');
@@ -166,12 +179,18 @@ export function mountDocument(container, initialOptions) {
     element: host,
     getDocument: () => { assertAlive(); return snapshot(); },
     update(document, settings = {}) {
-      assertAlive(); const next = structuredClone(validateDocument(document));
+      assertAlive();
+      // Echoes of our own onChange snapshot (controlled React use) need no validation or comparison.
+      const next = document === undefined || document === lastEmitted ? undefined : structuredClone(validateDocument(document));
       const nextOptions = { ...options, ...settings };
       if (!Number.isFinite(nextOptions.debounceMs) || nextOptions.debounceMs < 0) throw new TypeError('debounceMs must be nonnegative');
+      const hadSave = Boolean(options.onSave);
       options = nextOptions;
-      if (JSON.stringify(next) !== JSON.stringify(current)) {
-        epoch++; activeSave?.abort(); clearTimeout(timer); pending = false; current = next; status('idle');
+      if (next && JSON.stringify(next) !== JSON.stringify(current)) {
+        epoch++; activeSave?.abort(); clearTimeout(timer); pending = false; notesVisible = false; current = next; status('idle');
+      } else if (pending && options.onSave && !hadSave) {
+        // Edits made before a save handler existed are saved once one arrives.
+        status('pending'); schedule();
       }
       render();
     },

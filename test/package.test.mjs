@@ -2,12 +2,12 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import http from 'node:http';
-import { mkdtemp, readdir, symlink } from 'node:fs/promises';
+import { mkdtemp, readdir, symlink, readFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { startStudio, createStudio, createDocument } from 'intelligence-ui/node';
-import { renderDocument } from 'intelligence-ui/document';
+import { startStudio, createStudio, createDocument } from '@haowei2000/intelligence-ui/node';
+import { renderDocument } from '@haowei2000/intelligence-ui/document';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 
@@ -73,6 +73,27 @@ test('caller AI adapters perform analysis and regeneration while preserving stat
   } finally { await studio.close(); }
 });
 
+test('regeneration keeps ui.css and refuses to drop every decision', async () => {
+  const workspaceRoot = await mkdtemp(path.join(os.tmpdir(), 'studio-regen-'));
+  const seed = createDocument(); seed.ui.css = 'h1{color:red}';
+  let reply;
+  const studio = await startStudio({ workspaceRoot, port: 0, seedDocument: seed, ai: { complete: async () => JSON.stringify(reply) } });
+  try {
+    const { token } = await (await fetch(studio.url + '/api/config')).json();
+    let [doc] = await studio.store.list();
+    const regenerate = () => fetch(`${studio.url}/api/documents/${doc.manifest.id}/regenerate`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Document-Token': token }, body: JSON.stringify({ revision: doc.manifest.revision, prompt: 'x' }) });
+    reply = { title: '新', description: '', decisions: doc.decisions, ui: { html: '<p>新</p>' } };
+    const ok = await regenerate();
+    assert.equal(ok.status, 200);
+    doc = await ok.json();
+    assert.equal(doc.ui.css, 'h1{color:red}');
+    assert.equal(doc.ui.html, '<p>新</p>');
+    reply = { ...reply, decisions: [] };
+    assert.equal((await regenerate()).status, 400);
+    assert.equal((await studio.store.get(doc.manifest.id)).decisions.length, 3);
+  } finally { await studio.close(); }
+});
+
 test('CLI help/version are side effect free and invalid arguments fail clearly', async () => {
   const cwd = await mkdtemp(path.join(os.tmpdir(), 'studio-cli-'));
   const cli = path.join(root, 'bin', 'studio.mjs');
@@ -98,5 +119,18 @@ test('CLI runs through the executable symlink used by npm', async () => {
   await symlink(path.join(root, 'bin', 'studio.mjs'), link);
   const result = spawnSync(process.execPath, [link, '--version'], { cwd, encoding: 'utf8', timeout: 5000 });
   assert.equal(result.status, 0, result.stderr);
-  assert.equal(result.stdout.trim(), '0.2.0');
+  assert.equal(result.stdout.trim(), JSON.parse(await readFile(path.join(root, 'package.json'), 'utf8')).version);
+});
+
+test('every export and declaration points to a file that is published', async () => {
+  const pkg = JSON.parse(await readFile(path.join(root, 'package.json'), 'utf8'));
+  const published = file => pkg.files.some(entry => entry.endsWith('/') ? file.startsWith(entry) : file === entry);
+  for (const [entry, target] of Object.entries(pkg.exports)) {
+    for (const file of typeof target === 'string' ? [target] : Object.values(target)) {
+      const relative = file.replace(/^\.\//, '');
+      if (relative.includes('*') || relative === 'package.json') continue;
+      assert.ok(published(relative), `${entry} → ${relative} is not in files`);
+      await readFile(path.join(root, relative));
+    }
+  }
 });

@@ -1,0 +1,20 @@
+{
+  "port": 4320,
+  "contract": {
+    "actions": [
+      { "id": "submit-plan", "input": "form", "description": "Receives the trip preferences and plans the trip." },
+      { "id": "refresh-prices", "input": "none", "description": "Fetches current hotel prices." }
+    ],
+    "policy": {
+      "urls": {
+        "image": { "origins": ["https://images.example.com", "https://upload.wikimedia.org"] },
+        "webPreview": { "origins": ["https://www.openstreetmap.org"] }
+      }
+    }
+  },
+  "tokens": {
+    "demo-agent-token-change-me": { "id": "demo-agent", "roles": ["agent"], "surfaces": ["*"], "defaultSurface": "demo" },
+    "demo-user-token-change-me": { "id": "demo-user", "roles": ["user"], "surfaces": ["demo"] }
+  },
+  "cors": { "origins": ["http://localhost:4331", "http://127.0.0.1:4331"] }
+}

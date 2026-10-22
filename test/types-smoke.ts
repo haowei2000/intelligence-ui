@@ -1,5 +1,5 @@
-import { createDocument, startStudio, createStudio, DocumentStore, readReference, createChatCompletionProvider, type InteractiveDocument } from 'intelligence-ui/node';
-import { renderDocument } from 'intelligence-ui/document';
+import { createDocument, startStudio, createStudio, DocumentStore, readReference, createChatCompletionProvider, type InteractiveDocument } from '@haowei2000/intelligence-ui/node';
+import { renderDocument } from '@haowei2000/intelligence-ui/document';
 
 const doc: InteractiveDocument = createDocument('架构决策', '背景');
 doc.decisions = [{ id: 'storage', title: '存储', description: '', options: [

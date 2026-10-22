@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src https: data:; frame-src https:; connect-src 'self'; object-src 'none'; base-uri 'none'">
+  <link rel="icon" href="data:,">
+  <title>Intelligence UI Playground</title>
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="app.mjs"></script>
+</head>
+<body>
+  <header class="bar">
+    <strong>Intelligence UI Playground</strong>
+    <span id="contract-id" class="muted"></span>
+  </header>
+  <main class="layout">
+    <section class="pane editor" aria-labelledby="editor-title">
+      <div class="pane-head">
+        <h2 id="editor-title">Candidate</h2>
+        <label class="inline">Example
+          <select id="example">
+            <option value="trip-plan">Trip plan</option>
+            <option value="hotel-comparison">Hotel comparison</option>
+            <option value="account-settings">Account settings</option>
+            <option value="web-preview">Web preview</option>
+            <option value="broken">Broken output</option>
+          </select>
+        </label>
+      </div>
+      <textarea id="document" spellcheck="false" aria-label="Candidate JSON"></textarea>
+      <details>
+        <summary>Deployment contract options</summary>
+        <textarea id="contract" spellcheck="false" aria-label="createContract options JSON">{
+  "actions": [
+    { "id": "submit-plan", "input": "form" },
+    { "id": "refresh-prices", "input": "none" },
+    { "id": "save-settings", "input": "form" }
+  ]
+}</textarea>
+      </details>
+      <div class="actions">
+        <button id="validate" type="button">Validate</button>
+        <button id="fix" type="button">Fix</button>
+        <button id="publish" type="button" class="primary">Render as new document</button>
+        <button id="apply" type="button">Apply as next revision</button>
+      </div>
+    </section>
+    <section class="pane" aria-labelledby="result-title">
+      <div class="pane-head"><h2 id="result-title">Diagnostics</h2><span id="verdict" class="badge"></span></div>
+      <ul id="diagnostics" class="list"></ul>
+      <h3>Applied fixes</h3>
+      <ul id="fixes" class="list"></ul>
+    </section>
+    <section class="pane preview" aria-labelledby="preview-title">
+      <div class="pane-head"><h2 id="preview-title">Rendered</h2><span id="revision" class="muted"></span></div>
+      <div id="surface"></div>
+    </section>
+    <section class="pane" aria-labelledby="runtime-title">
+      <h2 id="runtime-title">Runtime</h2>
+      <h3>Events</h3>
+      <ol id="events" class="list"></ol>
+      <h3>Merge outcomes</h3>
+      <ul id="merge" class="list"></ul>
+      <h3>State</h3>
+      <pre id="state"></pre>
+    </section>
+  </main>
+</body>
+</html>

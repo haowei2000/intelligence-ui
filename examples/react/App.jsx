@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { DocumentRenderer } from 'intelligence-ui/react';
+import { DocumentRenderer } from '@haowei2000/intelligence-ui/react';
 
 export default function App({ initialDocument }) {
   const [document, setDocument] = useState(initialDocument);

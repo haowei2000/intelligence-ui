@@ -24,11 +24,14 @@ export const DocumentRenderer = forwardRef(function DocumentRenderer({ value, on
     controller.current = mounted;
     return () => { mounted.destroy(); controller.current = null; };
   }, []);
+  // Settings and document are applied separately: a new onSave identity on re-render must not reapply a stale value.
+  const hasSave = Boolean(onSave);
   useEffect(() => {
-    controller.current?.update(value, {
-      onSave: onSave ? (...args) => latest.current.onSave(...args) : undefined,
+    controller.current?.update(undefined, {
+      onSave: hasSave ? (...args) => latest.current.onSave(...args) : undefined,
       debounceMs, readOnly, styleNonce
     });
-  }, [value, onSave, debounceMs, readOnly, styleNonce]);
+  }, [hasSave, debounceMs, readOnly, styleNonce]);
+  useEffect(() => { controller.current?.update(value); }, [value]);
   return createElement('div', { ref: container, className, style });
 });

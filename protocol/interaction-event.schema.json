@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:intelligence-ui:protocol:1.0:interaction-event",
+  "title": "Intelligence UI interaction event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "eventId",
+    "documentId",
+    "baseRevision",
+    "sourceId",
+    "actionId",
+    "values"
+  ],
+  "properties": {
+    "eventId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "documentId": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,79}$"
+    },
+    "baseRevision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "sourceId": {
+      "type": "string",
+      "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,63}$"
+    },
+    "actionId": {
+      "type": "string",
+      "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,79}$"
+    },
+    "values": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,63}$"
+      },
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": [
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
+          },
+          {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    }
+  }
+}

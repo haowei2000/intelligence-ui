@@ -1,5 +1,5 @@
-import { createDocument, mountDocument, type InteractiveDocument } from 'intelligence-ui';
-import { DocumentRenderer, type DocumentRendererRef } from 'intelligence-ui/react';
+import { createDocument, mountDocument, type InteractiveDocument } from '@haowei2000/intelligence-ui';
+import { DocumentRenderer, type DocumentRendererRef } from '@haowei2000/intelligence-ui/react';
 import { createRef } from 'react';
 
 const document: InteractiveDocument = createDocument();
@@ -19,4 +19,4 @@ controller.destroy();
 // @ts-expect-error callbacks return a document or void, not an arbitrary value
 const bad = <DocumentRenderer value={document} onSave={async () => 12} />;
 // @ts-expect-error the browser entry does not expose filesystem/server APIs
-import { startStudio } from 'intelligence-ui';
+import { startStudio } from '@haowei2000/intelligence-ui';

@@ -1,0 +1,8 @@
+:root { color-scheme: light dark; --page: #f6f7f9; --ink: #1f2a37; }
+@media (prefers-color-scheme: dark) { :root { --page: #14181d; --ink: #e8ecf1; } }
+body { margin: 0; background: var(--page); color: var(--ink); font: 16px/1.5 system-ui, sans-serif; }
+main { max-width: 720px; margin: 0 auto; padding: 24px 16px 64px; }
+h1 { font-size: 24px; margin: 0 0 4px; }
+header p { margin: 0; opacity: .75; }
+#connection { font-size: 14px; margin-top: 8px; }
+#surface { display: flex; flex-direction: column; gap: 16px; margin-top: 24px; }
