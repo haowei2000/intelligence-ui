@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Intelligence UI</title>
+  <meta name="description" content="Interactive UI from any Agent: a JSON component protocol with validation, Autofix, a browser and React runtime, and HTTP, MCP and CLI tooling.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="site.css">
+</head>
+<body>
+  <header class="top">
+    <div class="top-inner">
+      <a class="brand" href="./">Intelligence UI</a>
+      <nav aria-label="Main">
+        <a href="docs/quick-start.html">Docs</a>
+        <a href="playground/">Playground</a>
+        <a href="protocol/">Protocol files</a>
+        <a href="https://github.com/haowei2000/intelligence-ui">GitHub</a>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <section class="hero">
+      <h1>Interactive cards from any Agent, checked before anyone sees them</h1>
+      <p>Your Agent writes a JSON component tree. Your host validates and repairs it, commits it, and a browser renders forms, choices, tables, links and previews. What the user does comes back as structured events. Any model, any backend language.</p>
+      <div class="actions">
+        <a class="button primary" href="docs/quick-start.html">Quick start</a>
+        <a class="button" href="playground/">Try the Playground</a>
+        <code class="install">npm install @haowei2000/intelligence-ui</code>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="cycle">
+      <h2 id="cycle">How it works</h2>
+      <ol class="steps">
+        <li><strong>Discover</strong><span>The Agent reads the host's contract: components, registered actions, limits and URL policy.</span></li>
+        <li><strong>Generate and repair</strong><span>Validation finds every problem at once; safe fixes apply automatically, the rest come back as precise diagnostics.</span></li>
+        <li><strong>Publish</strong><span>Only valid documents are committed and delivered. Rejected candidates never reach the user.</span></li>
+        <li><strong>Interact</strong><span>Typing and choosing run locally. Submissions return as validated events; new revisions keep what the user entered.</span></li>
+      </ol>
+    </section>
+
+    <section class="section" aria-labelledby="parts">
+      <h2 id="parts">What's included</h2>
+      <div class="grid">
+        <div class="card"><h3>Protocol</h3><p>17 components, JSON Schema, semantic rules and conformance cases any language can implement.</p></div>
+        <div class="card"><h3>Validation and Autofix</h3><p>Stable diagnostic codes with JSON Pointer paths. Fixes never invent ids, actions or data.</p></div>
+        <div class="card"><h3>Browser and React runtime</h3><p>Shadow DOM rendering with no eval and no HTML from the model. Works under a strict CSP.</p></div>
+        <div class="card"><h3>Delivery service</h3><p>HTTP and streaming delivery, server-side event checks, deduplication and an event log with cursors.</p></div>
+        <div class="card"><h3>MCP and CLI</h3><p>Five MCP tools over stdio or HTTP, and <code>validate</code>, <code>fix</code> and <code>contract</code> commands for CI.</p></div>
+        <div class="card"><h3>Agent Skill and examples</h3><p>A portable Skill, plus TypeScript and Python Agents that complete the full cycle with a separate frontend.</p></div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="docs">
+      <h2 id="docs">Documentation</h2>
+      <div class="grid">
+        <a class="card" href="docs/quick-start.html"><h3>Quick start</h3><p>The full cycle in about ten minutes.</p></a>
+        <a class="card" href="docs/components.html"><h3>Components</h3><p>Every component, property and default.</p></a>
+        <a class="card" href="docs/protocol.html"><h3>Protocol</h3><p>Documents, events, delivery and state merging.</p></a>
+        <a class="card" href="docs/autofix.html"><h3>Validation and Autofix</h3><p>Diagnostics, safe fixes and the repair loop.</p></a>
+        <a class="card" href="docs/deployment.html"><h3>Deployment</h3><p>Raw, Skill and MCP integration; the service and stores.</p></a>
+        <a class="card" href="docs/security.html"><h3>Security</h3><p>What a document can and cannot do.</p></a>
+      </div>
+    </section>
+  </main>
+  <footer><div>MIT License · <a href="https://github.com/haowei2000/intelligence-ui">Source on GitHub</a> · <a href="https://www.npmjs.com/package/@haowei2000/intelligence-ui">npm</a></div></footer>
+</body>
+</html>

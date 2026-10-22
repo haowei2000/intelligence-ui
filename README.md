@@ -4,19 +4,30 @@
 
 浏览器端不启动服务器、不依赖 Node.js，也不指定数据库或后端。支持原生 JavaScript 和 React。Node 宿主、CLI 是可选工具。
 
+## 0.3：组件协议（Agent 生成的交互界面）
+
+0.3 新增一套与语言无关的组件协议：Agent 输出 JSON 组件树，宿主在发布前校验与自动修复，浏览器渲染卡片，并把结构化的用户操作交回宿主。原有的 InteractiveDocument 入口保持不变。
+
+| 入口 | 用途 |
+| --- | --- |
+| `@haowei2000/intelligence-ui/protocol` | 契约、状态合并、宿主侧事件与状态校验 |
+| `@haowei2000/intelligence-ui/agent` | `validate`、`fix`、`repair`、`instructions` |
+| `@haowei2000/intelligence-ui/runtime`、`@haowei2000/intelligence-ui/runtime/react` | 浏览器与 React 渲染（运行时持有表单状态） |
+| `@haowei2000/intelligence-ui/node` | HTTP 投递服务、MCP 服务、存储 |
+
+非 JavaScript 项目可直接使用 `protocol/` 中的 JSON Schema、契约、生成说明和一致性用例，或调用 CLI（`intelligence-ui validate|fix|contract|serve|mcp`）、HTTP 与 MCP 服务。Agent Skill 位于 `skill/intelligence-ui`。
+
+文档（英文）：[快速上手](docs/quick-start.md) · [组件参考](docs/components.md) · [协议](docs/protocol.md) · [校验与自动修复](docs/autofix.md) · [部署](docs/deployment.md) · [安全](docs/security.md) · [迁移](docs/migration.md) · [实施计划](docs/implementation-plan.md)
+
 ## 安装
 
-当前未发布 npm registry，可安装打包文件：
-
 ```sh
-npm install /absolute/path/intelligence-ui-0.2.0.tgz
+npm install @haowei2000/intelligence-ui
 ```
 
-有私有仓库权限时也可从 GitHub 安装：
+也可从 GitHub 安装：`npm install github:haowei2000/intelligence-ui`。在线文档与 Playground：https://haowei2000.github.io/intelligence-ui/
 
-```sh
-npm install git+ssh://git@github.com/haowei2000/intelligence-ui.git
-```
+> 0.3 起包名为 `@haowei2000/intelligence-ui`（npm 上的 `intelligence-ui` 属于其他作者）。从打包文件或 Git 安装过 0.2 的项目，需要把导入路径中的 `intelligence-ui` 改为 `@haowei2000/intelligence-ui`，子路径不变。
 
 React 项目使用调用方已有的 React（18 或 19），不会再打包一份 React。原生入口没有运行时第三方依赖。
 
@@ -25,7 +36,7 @@ TypeScript React 项目使用项目自己的 `@types/react` 类型声明；未�
 ## 创建一份页面
 
 ```js
-import { createDocument } from 'intelligence-ui';
+import { createDocument } from '@haowei2000/intelligence-ui';
 
 const page = createDocument({
   title: '项目设置',
@@ -49,7 +60,7 @@ const page = createDocument({
 
 ```jsx
 import { useState } from 'react';
-import { DocumentRenderer } from 'intelligence-ui/react';
+import { DocumentRenderer } from '@haowei2000/intelligence-ui/react';
 
 function ProjectSettings({ initialDocument }) {
   const [page, setPage] = useState(initialDocument);
@@ -81,7 +92,7 @@ function ProjectSettings({ initialDocument }) {
 ## 在原生 JavaScript / Vue 等项目中使用
 
 ```js
-import { mountDocument } from 'intelligence-ui';
+import { mountDocument } from '@haowei2000/intelligence-ui';
 
 const renderer = mountDocument(document.querySelector('#page'), {
   document: page,
@@ -134,7 +145,7 @@ React ref 提供 `getDocument()` 与 `flush()`。原生 controller 还提供 `up
 
 ## 样式与 HTML
 
-页面在 Shadow DOM 中渲染，默认样式不会污染宿主页面。可通过 `ui.css` 定义页面样式，或使用 `--document-accent / --document-text / --document-muted / --document-border / --document-background / --document-selected` CSS 变量。使用严格 CSP 的项目可传入 `styleNonce`。
+页面在 Shadow DOM 中渲染，默认样式不会污染宿主页面。可通过 `ui.css` 定义页面样式（`mountDocument` 不应用含 `url()`、`@import`、`image-set()` 等外部资源引用的样式，并通过 `onError` 报告），或使用 `--document-accent / --document-text / --document-muted / --document-border / --document-background / --document-selected` CSS 变量。使用严格 CSP 的项目可传入 `styleNonce`。
 
 嵌入入口接受常用 HTML 内容与表单标签。自定义 HTML 的 script、iframe、事件属性和网络资源元素会被移除；数据绑定由库完成，不执行文档携带的任意 JavaScript。CSS 由调用方审核后提供。原有 `renderDocument(page, true)` 返回独立 HTML 文件，不等同于嵌入入口的 HTML 清理模式。
 
@@ -142,16 +153,16 @@ React wrapper 使用 `useEffect` 管理挂载和清理，支持 StrictMode。SSR
 
 ## 入口与示例
 
-- `intelligence-ui` / `intelligence-ui/browser`：`mountDocument`、文档创建/验证/合并/HTML 导出。
-- `intelligence-ui/react`：`DocumentRenderer` 与组件类型。
-- `intelligence-ui/document`：浏览器兼容的文档工具。
-- `intelligence-ui/node`：可选的 `DocumentStore`、`readReference`、`createStudio`、`startStudio`、AI 适配器。
+- `@haowei2000/intelligence-ui` / `@haowei2000/intelligence-ui/browser`：`mountDocument`、文档创建/验证/合并/HTML 导出。
+- `@haowei2000/intelligence-ui/react`：`DocumentRenderer` 与组件类型。
+- `@haowei2000/intelligence-ui/document`：浏览器兼容的文档工具。
+- `@haowei2000/intelligence-ui/node`：可选的 `DocumentStore`、`readReference`、`hash`、`createStudio`、`startStudio`、AI 适配器。
 
 React 接 HTTP 后端示例见 `examples/react/App.jsx`，页面定义见 `examples/react/page.mjs`。原生浏览器接 localStorage 示例见 `examples/vanilla/index.mjs`。这些示例属于调用方集成代码，不要求安装或运行独立工作台。
 
 在源码仓库中运行 `npm run demo`，打开 http://localhost:4311 即可测试 React 嵌入 → 自有 HTTP 接口 → 文件保存 → 重新加载。示例后端代码为 `examples/server.mjs`，数据保存在 `.data/embedding-demo/`。
 
-从 0.1 升级时，原来的 Node 导入需改成 `intelligence-ui/node`。CLI `intelligence-ui` 保留，Node 功能需要 Node.js 22+；浏览器代码依赖现代浏览器的 Web Crypto、Shadow DOM 和 structuredClone。
+从 0.1 升级时，原来的 Node 导入需改成 `@haowei2000/intelligence-ui/node`。CLI `@haowei2000/intelligence-ui` 保留，Node 功能需要 Node.js 22+；浏览器代码依赖现代浏览器的 Web Crypto、Shadow DOM 和 structuredClone。
 
 ## 开发与打包
 
@@ -162,4 +173,8 @@ npm test
 npm pack
 ```
 
-打包前自动验证类型和测试。包仅包含 SDK、声明、可选 CLI/工作台资源与 README，不包含本地文档数据、密钥或开发测试。当前 license 为 `UNLICENSED`，尚未发布 npm registry。
+打包前自动验证类型和测试。包仅包含 SDK、声明、可选 CLI/工作台资源与 README，不包含本地文档数据、密钥或开发测试。许可证为 MIT。
+
+## 许可证
+
+[MIT](LICENSE)：可自由使用、修改和分发，用于任何目的，只需保留版权与许可声明。
