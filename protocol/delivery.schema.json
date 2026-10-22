@@ -1,0 +1,342 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:intelligence-ui:protocol:1.0:delivery",
+  "title": "Intelligence UI delivery message",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/CommittedMessage"
+    },
+    {
+      "$ref": "#/$defs/ProposedMessage"
+    },
+    {
+      "$ref": "#/$defs/ActionStatusMessage"
+    }
+  ],
+  "$defs": {
+    "CommittedDocument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "revision",
+        "document",
+        "state"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,79}$"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "contractId": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "document": {
+          "$ref": "urn:intelligence-ui:protocol:1.0:ui-document"
+        },
+        "state": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "values",
+            "dirty"
+          ],
+          "properties": {
+            "values": {
+              "type": "object",
+              "propertyNames": {
+                "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,63}$"
+              },
+              "additionalProperties": {
+                "anyOf": [
+                  {
+                    "type": [
+                      "string",
+                      "number",
+                      "boolean",
+                      "null"
+                    ]
+                  },
+                  {
+                    "type": "array",
+                    "maxItems": 100,
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                ]
+              }
+            },
+            "dirty": {
+              "type": "array",
+              "maxItems": 500,
+              "items": {
+                "type": "string",
+                "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,63}$"
+              }
+            },
+            "archived": {
+              "type": "array",
+              "maxItems": 1000,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "bind",
+                  "value",
+                  "revision",
+                  "reason"
+                ],
+                "properties": {
+                  "bind": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,63}$"
+                  },
+                  "value": {
+                    "anyOf": [
+                      {
+                        "type": [
+                          "string",
+                          "number",
+                          "boolean",
+                          "null"
+                        ]
+                      },
+                      {
+                        "type": "array",
+                        "maxItems": 100,
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    ]
+                  },
+                  "revision": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "reason": {
+                    "enum": [
+                      "removed",
+                      "type-changed",
+                      "value-removed"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "State": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "values",
+        "dirty"
+      ],
+      "properties": {
+        "values": {
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,63}$"
+          },
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              {
+                "type": "array",
+                "maxItems": 100,
+                "items": {
+                  "type": "string"
+                }
+              }
+            ]
+          }
+        },
+        "dirty": {
+          "type": "array",
+          "maxItems": 500,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,63}$"
+          }
+        },
+        "archived": {
+          "type": "array",
+          "maxItems": 1000,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "bind",
+              "value",
+              "revision",
+              "reason"
+            ],
+            "properties": {
+              "bind": {
+                "type": "string",
+                "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,63}$"
+              },
+              "value": {
+                "anyOf": [
+                  {
+                    "type": [
+                      "string",
+                      "number",
+                      "boolean",
+                      "null"
+                    ]
+                  },
+                  {
+                    "type": "array",
+                    "maxItems": 100,
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                ]
+              },
+              "revision": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "reason": {
+                "enum": [
+                  "removed",
+                  "type-changed",
+                  "value-removed"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "CommittedMessage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "committed"
+      ],
+      "properties": {
+        "type": {
+          "const": "document.committed"
+        },
+        "surfaceId": {
+          "type": "string"
+        },
+        "committed": {
+          "$ref": "#/$defs/CommittedDocument"
+        }
+      }
+    },
+    "ProposedMessage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "documentId",
+        "baseRevision",
+        "candidate"
+      ],
+      "properties": {
+        "type": {
+          "const": "document.proposed"
+        },
+        "surfaceId": {
+          "type": "string"
+        },
+        "documentId": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,79}$"
+        },
+        "baseRevision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "candidate": {
+          "$ref": "urn:intelligence-ui:protocol:1.0:ui-document"
+        }
+      }
+    },
+    "ActionStatusMessage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "eventId",
+        "documentId",
+        "status"
+      ],
+      "properties": {
+        "type": {
+          "const": "action.status"
+        },
+        "surfaceId": {
+          "type": "string"
+        },
+        "eventId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "documentId": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,79}$"
+        },
+        "status": {
+          "enum": [
+            "accepted",
+            "succeeded",
+            "failed"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "maxLength": 1000
+        }
+      }
+    },
+    "ApplyOutcome": {
+      "type": "object",
+      "required": [
+        "outcome"
+      ],
+      "properties": {
+        "outcome": {
+          "enum": [
+            "applied",
+            "unchanged",
+            "stale",
+            "conflict",
+            "rejected",
+            "unsupported-protocol",
+            "incompatible-capabilities"
+          ]
+        },
+        "merge": {
+          "type": "array"
+        },
+        "diagnostics": {
+          "type": "array"
+        }
+      }
+    }
+  }
+}

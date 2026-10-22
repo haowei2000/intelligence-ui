@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "1.0",
+  "title": "Route preview",
+  "root": {
+    "type": "Stack",
+    "id": "preview-stack",
+    "children": [
+      { "type": "Text", "id": "preview-title", "text": "Your route", "variant": "heading2" },
+      { "type": "WebPreview", "id": "route-preview", "url": "https://maps.example.com/route/berlin-paris", "title": "Berlin to Paris route", "height": 420 },
+      { "type": "Text", "id": "preview-note", "text": "If the map does not load, open it in a new tab.", "variant": "caption", "tone": "muted" }
+    ]
+  }
+}

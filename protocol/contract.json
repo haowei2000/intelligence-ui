@@ -1,0 +1,962 @@
+{
+  "id": "iui-9af53e234327ab00",
+  "contractVersion": 1,
+  "profile": "standard",
+  "protocolVersion": "1.0",
+  "packageVersion": "0.3.0",
+  "components": {
+    "Stack": {
+      "category": "layout",
+      "description": "Arranges children vertically or horizontally.",
+      "slots": [
+        "children"
+      ],
+      "props": {
+        "direction": {
+          "schema": {
+            "enum": [
+              "vertical",
+              "horizontal"
+            ]
+          },
+          "default": "vertical",
+          "description": "Main axis."
+        },
+        "gap": {
+          "schema": {
+            "enum": [
+              "none",
+              "small",
+              "medium",
+              "large"
+            ]
+          },
+          "default": "medium",
+          "description": "Space between children."
+        },
+        "align": {
+          "schema": {
+            "enum": [
+              "start",
+              "center",
+              "end",
+              "stretch"
+            ]
+          },
+          "default": "stretch",
+          "description": "Cross axis alignment."
+        },
+        "wrap": {
+          "schema": {
+            "type": "boolean"
+          },
+          "default": false,
+          "description": "Wrap horizontal children onto new lines."
+        },
+        "children": {
+          "schema": {
+            "type": "array",
+            "items": {
+              "$ref": "Component"
+            }
+          },
+          "required": true,
+          "description": "Child components."
+        }
+      }
+    },
+    "Grid": {
+      "category": "layout",
+      "description": "Places children in equal columns that collapse to one column on narrow screens.",
+      "slots": [
+        "children"
+      ],
+      "props": {
+        "columns": {
+          "schema": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 6
+          },
+          "required": true,
+          "description": "Column count on wide screens."
+        },
+        "gap": {
+          "schema": {
+            "enum": [
+              "none",
+              "small",
+              "medium",
+              "large"
+            ]
+          },
+          "default": "medium",
+          "description": "Space between cells."
+        },
+        "children": {
+          "schema": {
+            "type": "array",
+            "items": {
+              "$ref": "Component"
+            }
+          },
+          "required": true,
+          "description": "Grid cells."
+        }
+      }
+    },
+    "Card": {
+      "category": "layout",
+      "description": "Groups related content under an optional title.",
+      "slots": [
+        "children"
+      ],
+      "props": {
+        "title": {
+          "schema": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "description": "Card heading."
+        },
+        "description": {
+          "schema": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "description": "Supporting text under the heading."
+        },
+        "children": {
+          "schema": {
+            "type": "array",
+            "items": {
+              "$ref": "Component"
+            }
+          },
+          "required": true,
+          "description": "Card content."
+        }
+      }
+    },
+    "Divider": {
+      "category": "layout",
+      "description": "A horizontal separator.",
+      "slots": [],
+      "props": {}
+    },
+    "Text": {
+      "category": "content",
+      "description": "Plain text. Variants cover headings, body copy, captions and code. Markup is not interpreted.",
+      "slots": [],
+      "props": {
+        "text": {
+          "schema": {
+            "type": "string",
+            "maxLength": 10000
+          },
+          "required": true,
+          "description": "Displayed text."
+        },
+        "variant": {
+          "schema": {
+            "enum": [
+              "heading1",
+              "heading2",
+              "heading3",
+              "body",
+              "caption",
+              "code"
+            ]
+          },
+          "default": "body",
+          "description": "Typographic role."
+        },
+        "tone": {
+          "schema": {
+            "enum": [
+              "default",
+              "muted",
+              "success",
+              "warning",
+              "danger"
+            ]
+          },
+          "default": "default",
+          "description": "Color emphasis."
+        }
+      }
+    },
+    "Image": {
+      "category": "content",
+      "description": "An image from an allowed URL with a text alternative.",
+      "slots": [],
+      "props": {
+        "src": {
+          "schema": {
+            "type": "string",
+            "maxLength": 2048
+          },
+          "required": true,
+          "description": "Absolute image URL; host policy decides allowed schemes and origins."
+        },
+        "alt": {
+          "schema": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "required": true,
+          "description": "Text alternative. Use an empty string only for purely decorative images."
+        },
+        "caption": {
+          "schema": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "description": "Visible caption."
+        },
+        "width": {
+          "schema": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4096
+          },
+          "description": "Intrinsic width in pixels, used to reserve space."
+        },
+        "height": {
+          "schema": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4096
+          },
+          "description": "Intrinsic height in pixels."
+        }
+      }
+    },
+    "Link": {
+      "category": "content",
+      "description": "Navigates to a URL. Use Button for actions.",
+      "slots": [],
+      "props": {
+        "href": {
+          "schema": {
+            "type": "string",
+            "maxLength": 2048
+          },
+          "required": true,
+          "description": "Absolute URL; host policy decides allowed schemes, origins and target."
+        },
+        "label": {
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "required": true,
+          "description": "Link text."
+        }
+      }
+    },
+    "Input": {
+      "category": "input",
+      "description": "Single or multi line entry. kind selects the value type: number stores a number or null, every other kind stores a string.",
+      "slots": [],
+      "binding": {
+        "byProp": "kind",
+        "map": {
+          "number": "number",
+          "*": "string"
+        }
+      },
+      "props": {
+        "bind": {
+          "schema": {
+            "type": "string",
+            "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,63}$"
+          },
+          "required": true,
+          "description": "Field key in state.values."
+        },
+        "label": {
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "required": true,
+          "description": "Visible label."
+        },
+        "kind": {
+          "schema": {
+            "enum": [
+              "text",
+              "email",
+              "url",
+              "tel",
+              "number",
+              "date",
+              "time"
+            ]
+          },
+          "default": "text",
+          "description": "Input kind; date is YYYY-MM-DD and time is HH:MM, both stored as strings."
+        },
+        "multiline": {
+          "schema": {
+            "type": "boolean"
+          },
+          "default": false,
+          "description": "Multi line entry. Only for kind text."
+        },
+        "placeholder": {
+          "schema": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "description": "Example value shown when empty."
+        },
+        "description": {
+          "schema": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "description": "Help text."
+        },
+        "required": {
+          "schema": {
+            "type": "boolean"
+          },
+          "default": false,
+          "description": "Must be non empty to submit."
+        },
+        "minLength": {
+          "schema": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10000
+          },
+          "description": "Minimum characters. Not for kind number."
+        },
+        "maxLength": {
+          "schema": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000
+          },
+          "description": "Maximum characters. Not for kind number."
+        },
+        "min": {
+          "schema": {
+            "type": "number"
+          },
+          "description": "Minimum value. Only for kind number."
+        },
+        "max": {
+          "schema": {
+            "type": "number"
+          },
+          "description": "Maximum value. Only for kind number."
+        },
+        "step": {
+          "schema": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "description": "Value granularity. Only for kind number."
+        },
+        "default": {
+          "schema": {
+            "type": [
+              "string",
+              "number",
+              "null"
+            ],
+            "maxLength": 10000
+          },
+          "description": "Initial value when the user has none: a string, or a number or null for kind number."
+        }
+      }
+    },
+    "Choice": {
+      "category": "input",
+      "description": "Single or multiple selection from options. mode single stores a string (empty string when nothing is selected); mode multiple stores an array of strings.",
+      "slots": [],
+      "binding": {
+        "byProp": "mode",
+        "map": {
+          "single": "string",
+          "multiple": "string[]"
+        }
+      },
+      "props": {
+        "bind": {
+          "schema": {
+            "type": "string",
+            "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,63}$"
+          },
+          "required": true,
+          "description": "Field key in state.values."
+        },
+        "label": {
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "required": true,
+          "description": "Visible group label."
+        },
+        "mode": {
+          "schema": {
+            "enum": [
+              "single",
+              "multiple"
+            ]
+          },
+          "required": true,
+          "description": "Selection mode."
+        },
+        "display": {
+          "schema": {
+            "enum": [
+              "buttons",
+              "radio",
+              "checkbox",
+              "select"
+            ]
+          },
+          "description": "Presentation. radio is single only, checkbox is multiple only. Defaults to radio for single and checkbox for multiple."
+        },
+        "options": {
+          "schema": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "value",
+                "label"
+              ],
+              "properties": {
+                "value": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "label": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 500
+                }
+              }
+            }
+          },
+          "required": true,
+          "description": "Options with unique values."
+        },
+        "description": {
+          "schema": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "description": "Help text."
+        },
+        "required": {
+          "schema": {
+            "type": "boolean"
+          },
+          "default": false,
+          "description": "Single: a value must be selected. Multiple: at least one, unless minSelected says otherwise."
+        },
+        "minSelected": {
+          "schema": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "description": "Minimum selections. Only for mode multiple."
+        },
+        "maxSelected": {
+          "schema": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "description": "Maximum selections. Only for mode multiple."
+        },
+        "default": {
+          "schema": {
+            "type": [
+              "string",
+              "array"
+            ],
+            "maxLength": 200,
+            "maxItems": 100,
+            "items": {
+              "type": "string"
+            }
+          },
+          "description": "Initial value: an option value for single, an array of option values for multiple."
+        }
+      }
+    },
+    "Toggle": {
+      "category": "input",
+      "description": "An on or off setting. Stores a boolean.",
+      "slots": [],
+      "binding": {
+        "type": "boolean"
+      },
+      "props": {
+        "bind": {
+          "schema": {
+            "type": "string",
+            "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,63}$"
+          },
+          "required": true,
+          "description": "Field key in state.values."
+        },
+        "label": {
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "required": true,
+          "description": "Visible label."
+        },
+        "description": {
+          "schema": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "description": "Help text."
+        },
+        "default": {
+          "schema": {
+            "type": "boolean"
+          },
+          "default": false,
+          "description": "Initial value."
+        }
+      }
+    },
+    "Slider": {
+      "category": "input",
+      "description": "Selects a number in a bounded range. Stores a number.",
+      "slots": [],
+      "binding": {
+        "type": "number"
+      },
+      "props": {
+        "bind": {
+          "schema": {
+            "type": "string",
+            "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,63}$"
+          },
+          "required": true,
+          "description": "Field key in state.values."
+        },
+        "label": {
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "required": true,
+          "description": "Visible label."
+        },
+        "min": {
+          "schema": {
+            "type": "number"
+          },
+          "required": true,
+          "description": "Lower bound."
+        },
+        "max": {
+          "schema": {
+            "type": "number"
+          },
+          "required": true,
+          "description": "Upper bound; greater than min."
+        },
+        "step": {
+          "schema": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "default": 1,
+          "description": "Increment; not larger than max - min."
+        },
+        "description": {
+          "schema": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "description": "Help text."
+        },
+        "default": {
+          "schema": {
+            "type": "number"
+          },
+          "description": "Initial value within the bounds. Defaults to min."
+        }
+      }
+    },
+    "Form": {
+      "category": "form",
+      "description": "Submission scope. Submitting sends the values of the visible fields inside the form to submitAction. Forms cannot nest.",
+      "slots": [
+        "children"
+      ],
+      "props": {
+        "submitAction": {
+          "schema": {
+            "type": "string",
+            "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,79}$"
+          },
+          "required": true,
+          "description": "Registered host action that receives the submitted values."
+        },
+        "children": {
+          "schema": {
+            "type": "array",
+            "items": {
+              "$ref": "Component"
+            }
+          },
+          "required": true,
+          "description": "Fields and buttons."
+        }
+      }
+    },
+    "Button": {
+      "category": "form",
+      "description": "Runs an action. submit and reset act on the enclosing Form; action calls a registered host action without form values.",
+      "slots": [],
+      "props": {
+        "label": {
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "required": true,
+          "description": "Button text."
+        },
+        "action": {
+          "schema": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "enum": [
+                  "submit",
+                  "reset",
+                  "action"
+                ]
+              },
+              "actionId": {
+                "type": "string",
+                "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,79}$"
+              }
+            },
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "action"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "required": [
+                "actionId"
+              ]
+            }
+          },
+          "required": true,
+          "description": "{\"type\":\"submit\"}, {\"type\":\"reset\"} or {\"type\":\"action\",\"actionId\":\"<registered action>\"}."
+        },
+        "variant": {
+          "schema": {
+            "enum": [
+              "primary",
+              "secondary",
+              "danger"
+            ]
+          },
+          "description": "Emphasis. Defaults to primary for submit and secondary otherwise."
+        }
+      }
+    },
+    "Tabs": {
+      "category": "organization",
+      "description": "Switches between panels locally. Tab switching never calls the host.",
+      "slots": [
+        "tabs/*/children"
+      ],
+      "props": {
+        "label": {
+          "schema": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "description": "Accessible name for the tab list."
+        },
+        "tabs": {
+          "schema": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 20,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "label",
+                "children"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,63}$"
+                },
+                "label": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "children": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "Component"
+                  }
+                }
+              }
+            }
+          },
+          "required": true,
+          "description": "Tabs with unique ids."
+        },
+        "defaultTab": {
+          "schema": {
+            "type": "string",
+            "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,63}$"
+          },
+          "description": "Initially active tab id. Defaults to the first tab."
+        }
+      }
+    },
+    "Disclosure": {
+      "category": "organization",
+      "description": "Content that the user can expand and collapse locally.",
+      "slots": [
+        "children"
+      ],
+      "props": {
+        "label": {
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "required": true,
+          "description": "Toggle text and accessible name."
+        },
+        "defaultOpen": {
+          "schema": {
+            "type": "boolean"
+          },
+          "default": false,
+          "description": "Initially expanded."
+        },
+        "children": {
+          "schema": {
+            "type": "array",
+            "items": {
+              "$ref": "Component"
+            }
+          },
+          "required": true,
+          "description": "Collapsible content."
+        }
+      }
+    },
+    "Table": {
+      "category": "data",
+      "description": "Shows rows from a dataset. Sorting is local.",
+      "slots": [],
+      "props": {
+        "dataset": {
+          "schema": {
+            "type": "string",
+            "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,63}$"
+          },
+          "required": true,
+          "description": "Name of a dataset in the document's datasets."
+        },
+        "columns": {
+          "schema": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 20,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field",
+                "label"
+              ],
+              "properties": {
+                "field": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64
+                },
+                "label": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "format": {
+                  "enum": [
+                    "text",
+                    "number",
+                    "date"
+                  ]
+                }
+              }
+            }
+          },
+          "required": true,
+          "description": "Columns with unique fields. format number requires numeric values or null."
+        },
+        "rowKey": {
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "description": "Field whose values identify rows uniquely."
+        },
+        "sortable": {
+          "schema": {
+            "type": "boolean"
+          },
+          "default": false,
+          "description": "Allow local sorting by column."
+        },
+        "caption": {
+          "schema": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "description": "Table caption."
+        },
+        "emptyText": {
+          "schema": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "description": "Shown when the dataset has no rows."
+        }
+      }
+    },
+    "WebPreview": {
+      "category": "external",
+      "description": "Embeds an external page in a sandboxed frame with an open original link. Sites may refuse embedding; the link always remains.",
+      "slots": [],
+      "props": {
+        "url": {
+          "schema": {
+            "type": "string",
+            "maxLength": 2048
+          },
+          "required": true,
+          "description": "Absolute URL; host policy decides allowed origins and sandbox."
+        },
+        "title": {
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "required": true,
+          "description": "Frame title and link text."
+        },
+        "height": {
+          "schema": {
+            "type": "integer",
+            "minimum": 200,
+            "maximum": 1200
+          },
+          "default": 480,
+          "description": "Frame height in pixels."
+        }
+      }
+    }
+  },
+  "actions": null,
+  "limits": {
+    "maxBytes": 262144,
+    "maxDepth": 16,
+    "maxComponents": 500,
+    "maxStringLength": 10000,
+    "maxOptions": 100,
+    "maxDatasets": 20,
+    "maxDatasetRows": 1000,
+    "maxDiagnostics": 100
+  },
+  "policy": {
+    "urls": {
+      "image": {
+        "schemes": [
+          "https"
+        ],
+        "origins": [
+          "*"
+        ]
+      },
+      "link": {
+        "schemes": [
+          "https",
+          "http",
+          "mailto"
+        ],
+        "origins": [
+          "*"
+        ]
+      },
+      "webPreview": {
+        "schemes": [
+          "https"
+        ],
+        "origins": [
+          "*"
+        ]
+      }
+    },
+    "webPreview": {
+      "sandbox": [
+        "allow-scripts",
+        "allow-forms",
+        "allow-popups"
+      ],
+      "hostOrigins": []
+    },
+    "link": {
+      "target": "blank"
+    }
+  }
+}

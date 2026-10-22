@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "1.0",
+  "title": "Hotel options",
+  "datasets": {
+    "hotels": {
+      "rows": [
+        { "name": "Hotel Adlon", "district": "Mitte", "price": 410, "rating": 4.8 },
+        { "name": "Michelberger", "district": "Friedrichshain", "price": 140, "rating": 4.5 },
+        { "name": "Motel One", "district": "Alexanderplatz", "price": 99, "rating": 4.3 }
+      ]
+    }
+  },
+  "root": {
+    "type": "Card",
+    "id": "hotels-card",
+    "title": "Where to stay",
+    "children": [
+      {
+        "type": "Tabs",
+        "id": "hotel-tabs",
+        "label": "Hotel views",
+        "tabs": [
+          {
+            "id": "table",
+            "label": "Compare",
+            "children": [
+              { "type": "Table", "id": "hotel-table", "dataset": "hotels", "rowKey": "name", "sortable": true, "caption": "Prices per night", "columns": [
+                { "field": "name", "label": "Hotel" },
+                { "field": "district", "label": "District" },
+                { "field": "price", "label": "Price (EUR)", "format": "number" },
+                { "field": "rating", "label": "Rating", "format": "number" }
+              ] }
+            ]
+          },
+          {
+            "id": "summary",
+            "label": "Summary",
+            "children": [
+              { "type": "Grid", "id": "summary-grid", "columns": 2, "children": [
+                { "type": "Text", "id": "cheapest", "text": "Cheapest: Motel One, 99 EUR" },
+                { "type": "Text", "id": "best-rated", "text": "Best rated: Hotel Adlon, 4.8" }
+              ] }
+            ]
+          }
+        ]
+      },
+      { "type": "Divider", "id": "hotels-divider" },
+      { "type": "Disclosure", "id": "method", "label": "How prices were collected", "children": [
+        { "type": "Text", "id": "method-text", "text": "Prices are the lowest public rate for next Saturday.", "variant": "caption", "tone": "muted" }
+      ] },
+      { "type": "Stack", "id": "hotel-actions", "direction": "horizontal", "gap": "small", "children": [
+        { "type": "Button", "id": "refresh", "label": "Refresh prices", "action": { "type": "action", "actionId": "refresh-prices" } }
+      ] }
+    ]
+  }
+}

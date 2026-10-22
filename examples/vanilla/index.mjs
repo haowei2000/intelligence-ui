@@ -1,4 +1,4 @@
-import { createDocument, mountDocument } from 'intelligence-ui';
+import { createDocument, mountDocument } from '@haowei2000/intelligence-ui';
 
 // Replace localStorage with the host project's HTTP/database/file adapter.
 const key = 'project-settings';

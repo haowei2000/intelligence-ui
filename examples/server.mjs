@@ -3,7 +3,7 @@ import http from 'node:http';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
-import { DocumentStore } from 'intelligence-ui/node';
+import { DocumentStore } from '@haowei2000/intelligence-ui/node';
 import { initialDocument } from './react/page.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));

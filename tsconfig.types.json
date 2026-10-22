@@ -8,5 +8,5 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["index.d.ts", "types/**/*.d.ts", "test/types-smoke.ts", "test/browser-types.tsx"]
+  "include": ["index.d.ts", "types/**/*.d.ts", "test/types-smoke.ts", "test/browser-types.tsx", "test/protocol-types.tsx", "examples/protocol/agent-typescript/agent.ts"]
 }

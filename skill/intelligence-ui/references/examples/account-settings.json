@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "1.0",
+  "title": "Notification settings",
+  "root": {
+    "type": "Form",
+    "id": "settings-form",
+    "submitAction": "save-settings",
+    "children": [
+      { "type": "Input", "id": "email-input", "bind": "email", "label": "Email", "kind": "email", "required": true, "placeholder": "you@example.com" },
+      { "type": "Toggle", "id": "digest-toggle", "bind": "digest", "label": "Send a weekly digest", "default": true },
+      { "type": "Choice", "id": "day-choice", "bind": "digestDay", "label": "Digest day", "mode": "single", "display": "select", "default": "monday",
+        "visibleWhen": { "bind": "digest", "op": "equals", "value": true },
+        "options": [ { "value": "monday", "label": "Monday" }, { "value": "friday", "label": "Friday" } ] },
+      { "type": "Input", "id": "limit-input", "bind": "limit", "label": "Maximum emails per week", "kind": "number", "min": 1, "max": 20, "default": 5 },
+      { "type": "Stack", "id": "settings-buttons", "direction": "horizontal", "gap": "small", "children": [
+        { "type": "Button", "id": "save", "label": "Save", "action": { "type": "submit" } },
+        { "type": "Button", "id": "reset", "label": "Reset", "action": { "type": "reset" } }
+      ] }
+    ]
+  }
+}

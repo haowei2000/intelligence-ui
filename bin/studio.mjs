@@ -6,6 +6,13 @@ import { readFile, realpath } from 'node:fs/promises';
 import { startStudio, createChatCompletionProvider } from '../lib/host.mjs';
 
 export async function runCLI(args = process.argv.slice(2)) {
+  // Protocol and service commands; anything else keeps the 0.2 studio behavior.
+  const { commands, runCommand } = await import('../lib/cli.mjs');
+  if (commands.has(args[0])) {
+    const result = await runCommand(args);
+    if (typeof result === 'number') process.exitCode = result;
+    return result;
+  }
   try {
     const { values } = parseArgs({ args, options: {
       workspace: { type: 'string', short: 'w' },
@@ -13,7 +20,7 @@ export async function runCLI(args = process.argv.slice(2)) {
       help: { type: 'boolean', short: 'h' }, version: { type: 'boolean', short: 'v' }
     } });
     if (values.help) {
-      console.log('Usage: intelligence-ui [--workspace <path>] [--data-dir <path>] [--port <0-65535>]\n\n-w, --workspace  Code workspace (default: current directory)\n    --data-dir   Document storage (default: <workspace>/.data/documents)\n-p, --port       Local HTTP port (default: 4310; 0 selects a free port)\n-h, --help       Show help\n-v, --version    Show package version');
+      console.log('Usage: intelligence-ui [--workspace <path>] [--data-dir <path>] [--port <0-65535>]\n       intelligence-ui <contract|instructions|validate|fix|serve|mcp|playground> --help\n\n-w, --workspace  Code workspace (default: current directory)\n    --data-dir   Document storage (default: <workspace>/.data/documents)\n-p, --port       Local HTTP port (default: 4310; 0 selects a free port)\n-h, --help       Show help\n-v, --version    Show package version');
       return;
     }
     if (values.version) { console.log(JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8')).version); return; }

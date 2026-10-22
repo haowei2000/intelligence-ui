@@ -1,0 +1,42 @@
+{
+  "schemaVersion": "1.0",
+  "title": "Trip plan",
+  "root": {
+    "type": "Card",
+    "id": "trip-card",
+    "title": "Plan your weekend",
+    "description": "Pick a destination and what you want to do. You can change your answers later.",
+    "children": [
+      { "type": "Image", "id": "cover", "src": "https://images.example.com/berlin.jpg", "alt": "Brandenburg Gate at dusk", "width": 1200, "height": 600 },
+      { "type": "Link", "id": "guide-link", "href": "https://example.com/travel-guide", "label": "Read the travel guide" },
+      {
+        "type": "Form",
+        "id": "trip-form",
+        "submitAction": "submit-plan",
+        "children": [
+          {
+            "type": "Choice", "id": "destination-choice", "bind": "destination", "label": "Destination",
+            "mode": "single", "display": "buttons", "default": "berlin", "required": true,
+            "options": [
+              { "value": "berlin", "label": "Berlin", "description": "Museums and nightlife" },
+              { "value": "paris", "label": "Paris", "description": "Food and architecture" }
+            ]
+          },
+          {
+            "type": "Choice", "id": "activities-choice", "bind": "activities", "label": "Activities",
+            "mode": "multiple", "display": "checkbox", "minSelected": 1, "maxSelected": 3,
+            "options": [
+              { "value": "museums", "label": "Museums" },
+              { "value": "food", "label": "Food tour" },
+              { "value": "cycling", "label": "Cycling" },
+              { "value": "concert", "label": "Concert" }
+            ]
+          },
+          { "type": "Slider", "id": "budget-slider", "bind": "budget", "label": "Budget (EUR)", "min": 100, "max": 2000, "step": 50, "default": 600 },
+          { "type": "Input", "id": "notes-input", "bind": "notes", "label": "Anything else?", "multiline": true, "maxLength": 500 },
+          { "type": "Button", "id": "submit-trip", "label": "Continue", "action": { "type": "submit" } }
+        ]
+      }
+    ]
+  }
+}
