@@ -1,4 +1,5 @@
 // Minimal Chrome DevTools Protocol driver for scripts/browser-check.mjs: headless Chrome, no dependencies.
+// Same interface as bidi.mjs.
 // Set CHROME_PATH to use another Chromium-based browser.
 import { spawn } from 'node:child_process';
 import { mkdtemp, readFile, writeFile } from 'node:fs/promises';
@@ -33,11 +34,17 @@ export async function launch() {
     if (result.exceptionDetails) throw new Error(result.exceptionDetails.exception?.description || result.exceptionDetails.text);
     return result.result.value;
   };
+  const resize = (width, height) => send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: width < 600 });
   return {
-    send, evaluate, logs,
+    send, evaluate, logs, resize,
+    colorScheme: scheme => send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: scheme }] }),
+    async press(key) {
+      const codes = { ArrowLeft: 37, ArrowUp: 38, ArrowRight: 39, ArrowDown: 40, Enter: 13, Tab: 9 };
+      for (const type of ['keyDown', 'keyUp']) await send('Input.dispatchKeyEvent', { type, key, code: key, windowsVirtualKeyCode: codes[key] });
+    },
     async goto(url) { await send('Page.navigate', { url }); await new Promise(r => setTimeout(r, 1500)); },
     async screenshot(file, width = 1280, height = 900) {
-      await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: width < 600 });
+      await resize(width, height);
       const { data } = await send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true });
       await writeFile(file, Buffer.from(data, 'base64'));
     },

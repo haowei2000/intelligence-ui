@@ -1,7 +1,8 @@
 #!/usr/bin/env node
-// Real-browser check in headless Chrome: the Playground, and the full cycle of a Python Agent, the
-// service and the separately hosted frontend under its strict CSP. Also checks color contrast with real
-// layout in light and dark mode. Usage: node scripts/browser-check.mjs [screenshot-dir]
+// Real-browser check in headless Chrome or Firefox: the Playground, and the full cycle of a Python Agent,
+// the service and the separately hosted frontend under its strict CSP. Also checks color contrast with
+// real layout in light and dark mode.
+// Usage: node scripts/browser-check.mjs [--browser chrome|firefox] [screenshot-dir]
 import http from 'node:http';
 import net from 'node:net';
 import { spawn, spawnSync } from 'node:child_process';
@@ -9,13 +10,18 @@ import { readFile, mkdir } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { launch } from './cdp.mjs';
 import { createServer } from '../lib/cli.mjs';
 import { createAssetHandler } from '../lib/service/assets.mjs';
 import { createFrontend } from '../examples/protocol/frontend/server.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
-const shots = process.argv[2];
+const args = process.argv.slice(2);
+const flag = args.indexOf('--browser');
+const browserName = flag === -1 ? 'chrome' : args.splice(flag, 2)[1];
+const drivers = { chrome: './cdp.mjs', firefox: './bidi.mjs' };
+if (!drivers[browserName]) { console.error(`unknown browser "${browserName}"; use chrome or firefox`); process.exit(2); }
+const { launch } = await import(drivers[browserName]);
+const shots = args[0];
 if (shots) await mkdir(shots, { recursive: true });
 const python = ['python3', 'python'].find(command => spawnSync(command, ['--version']).status === 0);
 if (!python) { console.error('python3 is required for the Agent'); process.exit(2); }
@@ -46,7 +52,7 @@ const errors = () => browser.logs.filter(line => !/ERR_NAME_NOT_RESOLVED/.test(l
 let card = `document.querySelector('#surface > div')?.shadowRoot`;
 try {
   for (const scheme of ['light', 'dark']) {
-    await browser.send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: scheme }] });
+    await browser.colorScheme(scheme);
     await browser.goto(`http://localhost:${playgroundPort}/assets/playground/`);
     await browser.waitFor(`document.querySelector('#verdict').textContent === 'valid'`);
     await browser.evaluate(`document.querySelector('#publish').click()`);
@@ -59,12 +65,12 @@ try {
   await browser.waitFor(`${card}.querySelector('.status').textContent.includes('Handled')`);
   expect((await browser.evaluate(`document.querySelector('#events li').textContent`)).includes('"destination":"paris"'), 'playground event values');
   await browser.evaluate(`${card}.querySelector('input[value=berlin]').focus()`);
-  for (const type of ['keyDown', 'keyUp']) await browser.send('Input.dispatchKeyEvent', { type, key: 'ArrowRight', code: 'ArrowRight', windowsVirtualKeyCode: 39 });
+  await browser.press('ArrowRight');
   expect(await browser.evaluate(`${card}.querySelector('input[value=paris]').checked`), 'arrow keys move the single choice');
   await shot('playground.png');
   await shot('playground-phone.png', 390, 844);
   expect(!(await browser.evaluate(`document.documentElement.scrollWidth > window.innerWidth`)), 'no horizontal scroll at phone width');
-  await browser.send('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
+  await browser.resize(1280, 900);
   expect(!errors().length, `playground console: ${errors().join(' | ')}`);
   browser.logs.length = 0;
 
@@ -78,7 +84,7 @@ try {
   expect(await browser.evaluate(`${card}.querySelector('input[value=paris]').checked`), 'choice preserved in revision 2');
   await browser.waitFor(`${card}.querySelector('.status').textContent === 'Done.'`, 10000);
   for (const scheme of ['light', 'dark']) {
-    await browser.send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: scheme }] });
+    await browser.colorScheme(scheme);
     await browser.evaluate(axe);
     const violations = await browser.evaluate(contrast);
     expect(!violations.length, `frontend contrast (${scheme}): ${violations.join(', ')}`);
@@ -91,5 +97,5 @@ try {
   browser.close(); agent.kill();
   for (const server of [service, frontend, playground]) { server.closeAllConnections(); server.close(); }
 }
-if (failures.length) { console.error(`browser check failed:\n- ${failures.join('\n- ')}`); process.exit(1); }
-console.log(`browser check passed${shots ? `; screenshots in ${shots}` : ''}`);
+if (failures.length) { console.error(`browser check failed in ${browserName}:\n- ${failures.join('\n- ')}`); process.exit(1); }
+console.log(`browser check passed in ${browserName}${shots ? `; screenshots in ${shots}` : ''}`);
