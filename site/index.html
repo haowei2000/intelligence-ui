@@ -14,6 +14,7 @@
       <a class="brand" href="./">Intelligence UI</a>
       <nav aria-label="Main">
         <a href="docs/quick-start.html">Docs</a>
+        <a href="docs/api.html">API</a>
         <a href="playground/">Playground</a>
         <a href="protocol/">Protocol files</a>
         <a href="https://github.com/haowei2000/intelligence-ui">GitHub</a>
@@ -28,6 +29,92 @@
         <a class="button primary" href="docs/quick-start.html">Quick start</a>
         <a class="button" href="playground/">Try the Playground</a>
         <code class="install">npm install @haowei2000/intelligence-ui</code>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="start">
+      <h2 id="start">Start building</h2>
+      <p class="lead">One package covers each part of the cycle. Pick the part you own; every snippet below runs against <code>@haowei2000/intelligence-ui</code> 0.3.</p>
+      <div class="paths">
+        <article class="path">
+          <h3>Agent backend in Node</h3>
+          <p>Tell the model what it may build, then publish only what validates.</p>
+<pre tabindex="0"><code>import { createContract } from '@haowei2000/intelligence-ui/protocol';
+import { instructions, fix, repairFeedback } from '@haowei2000/intelligence-ui/agent';
+
+const contract = createContract({
+  actions: [{ id: 'submit-plan', input: 'form' }]
+});
+const system = `${yourPrompt}\n\n${instructions(contract)}`;
+
+const result = fix(modelOutputText, { contract });
+if (result.valid) await publish(result.document);
+else await askModelAgain(repairFeedback(result));</code></pre>
+          <a href="docs/autofix.html">Validation and Autofix →</a>
+        </article>
+        <article class="path">
+          <h3>Agent backend in any language</h3>
+          <p>Publish over HTTP; the service validates first and answers 422 with diagnostics.</p>
+<pre tabindex="0"><code>import json, urllib.request
+
+body = {"document": candidate, "baseRevision": 0}
+request = urllib.request.Request(
+    f"{SERVICE}/ui/surfaces/{surface}/documents/trip",
+    data=json.dumps(body).encode(), method="PUT",
+    headers={"Authorization": f"Bearer {AGENT_TOKEN}",
+             "Content-Type": "application/json"})
+urllib.request.urlopen(request)</code></pre>
+          <a href="docs/deployment.html#routes">HTTP routes →</a>
+        </article>
+        <article class="path">
+          <h3>Host service</h3>
+          <p>Run it standalone, or mount it in your Node server with your own sign-in.</p>
+<pre tabindex="0"><code>npx @haowei2000/intelligence-ui serve --config config.json</code></pre>
+<pre tabindex="0"><code>import { createUIService } from '@haowei2000/intelligence-ui/node';
+
+const service = createUIService({
+  contract,
+  authenticate: req =&gt; sessions.principalFor(req),
+  onEvent: async event =&gt; { await queue.enqueue(event); return { status: 'accepted' }; }
+});
+// in your server: if (!(await service.handle(req, res))) next();</code></pre>
+          <a href="docs/deployment.html">Deployment →</a>
+        </article>
+        <article class="path">
+          <h3>Browser frontend</h3>
+          <p>Stream committed cards into a page. Input stays local until the user submits.</p>
+<pre tabindex="0"><code>import { connectSurface } from '@haowei2000/intelligence-ui/runtime';
+
+connectSurface({
+  baseUrl: 'https://api.example.com/ui',
+  surfaceId: conversationId,
+  container: document.querySelector('#cards'),
+  headers: async () =&gt; ({ Authorization: `Bearer ${await token()}` })
+});</code></pre>
+          <a href="docs/api.html#runtime">Runtime API →</a>
+        </article>
+        <article class="path">
+          <h3>React</h3>
+          <p>An uncontrolled renderer: pass new revisions in, get events and state out.</p>
+<pre tabindex="0"><code>import { UIRenderer } from '@haowei2000/intelligence-ui/runtime/react';
+
+&lt;UIRenderer
+  document={committed}
+  onAction={event =&gt; sendEvent(event)}
+  onSave={state =&gt; saveState(committed.id, state)}
+/&gt;</code></pre>
+          <a href="docs/api.html#runtimereact">React API →</a>
+        </article>
+        <article class="path">
+          <h3>MCP clients and CI</h3>
+          <p>Give an MCP-capable Agent five UI tools, or check documents in a pipeline.</p>
+<pre tabindex="0"><code>{ "mcpServers": { "intelligence-ui": {
+  "command": "npx",
+  "args": ["-y", "@haowei2000/intelligence-ui", "mcp", "--surface", "demo"]
+} } }</code></pre>
+<pre tabindex="0"><code>npx @haowei2000/intelligence-ui validate card.json --deployment deployment.json</code></pre>
+          <a href="docs/api.html#cli">CLI reference →</a>
+        </article>
       </div>
     </section>
 
@@ -57,6 +144,7 @@
       <h2 id="docs">Documentation</h2>
       <div class="grid">
         <a class="card" href="docs/quick-start.html"><h3>Quick start</h3><p>The full cycle in about ten minutes.</p></a>
+        <a class="card" href="docs/api.html"><h3>API reference</h3><p>Every export, CLI command and protocol file.</p></a>
         <a class="card" href="docs/components.html"><h3>Components</h3><p>Every component, property and default.</p></a>
         <a class="card" href="docs/protocol.html"><h3>Protocol</h3><p>Documents, events, delivery and state merging.</p></a>
         <a class="card" href="docs/autofix.html"><h3>Validation and Autofix</h3><p>Diagnostics, safe fixes and the repair loop.</p></a>
