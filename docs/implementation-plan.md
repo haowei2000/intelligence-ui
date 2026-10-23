@@ -49,7 +49,7 @@ Ajv has been added as a preparatory dependency. It is used at build time to gene
 
 ## Implementation Status
 
-Package `0.3.0` implements P0 through P4 except the items marked open. Run `npm test` (140+ tests), `npm run check:types`, `npm run check:generated` and, with Python and Chrome or Firefox installed, `npm run check:browser` and `npm run check:browser:firefox`.
+Package `0.3.0` implements P0 through P4 except the items marked open. Run `npm test` (140+ tests), `npm run check:types`, `npm run check:generated` and, with Python and a browser installed, `npm run check:browser` (Chrome), `npm run check:browser:firefox` or `npm run check:browser:safari`.
 
 | Milestone | Delivered | Where |
 | --- | --- | --- |
@@ -57,13 +57,13 @@ Package `0.3.0` implements P0 through P4 except the items marked open. Run `npm 
 | P1 | Parser, structural, semantic, capability and policy validation; bounded diagnostics; deterministic Autofix; bounded model repair loop; Raw contract export; CLI with documented exit codes | `lib/protocol/`, `agent.mjs`, `lib/cli.mjs`, `docs/autofix.md` |
 | P2 | 17 components; uncontrolled browser runtime; React wrapper; form scope and typed submission; host actions with status; three-way merge with every table row tested; WebPreview with policy sandbox; axe-core audit of every component | `lib/runtime/`, `test/runtime.test.mjs`, `test/accessibility.test.mjs` |
 | P3 | HTTP delivery service with SSE, event re-validation, deduplication, cursor event log, state saves; MCP over stdio and stateless HTTP, tested with the official SDK client; Agent Skill; TypeScript and Python Agents; separately hosted frontend; automated Python round trip | `lib/service/`, `skill/intelligence-ui/`, `examples/protocol/`, `test/e2e.test.mjs` |
-| P4 | Quick start, protocol, Autofix, deployment, security and migration guides; Playground; export and packaging checks; clean install verified from the packed tarball; headless Chrome and Firefox checks; SQLite store | `docs/`, `playground/`, `test/package.test.mjs`, `scripts/browser-check.mjs`, `lib/service/sqlite-store.mjs` |
+| P4 | Quick start, protocol, Autofix, deployment, security and migration guides; Playground; export and packaging checks; clean install verified from the packed tarball; Chrome, Firefox and Safari checks; SQLite store | `docs/`, `playground/`, `test/package.test.mjs`, `scripts/browser-check.mjs`, `lib/service/sqlite-store.mjs` |
 
 Open items:
 
 - **Structured output experiment (P0 gate):** 1 of 3 providers tested. Zhipu GLM accepted the canonical recursive schema in strict mode with 9 of 9 valid outputs ([results](experiments/structured-output.md)). Two more providers are needed; the recursive schema stays provisional until they pass.
 - **Milestone owners and estimates:** not assigned.
-- **Cross-browser coverage:** `npm run check:browser` (Chrome) and `npm run check:browser:firefox` run the Playground and the full Agent, service and frontend cycle in headless browsers, including strict CSP, keyboard selection, phone width and light and dark color contrast. CI runs both. Safari and screen readers have not been tested.
+- **Screen readers:** `npm run check:browser` (Chrome), `check:browser:firefox` and `check:browser:safari` run the Playground and the full Agent, service and frontend cycle, including strict CSP, keyboard selection, phone width and color contrast; CI runs Chrome and Firefox, and Safari runs locally on macOS (contrast in the system appearance only). Screen readers have not been tested.
 - **Distributed store:** `MemoryUIStore` and `SqliteUIStore` (one machine) ship; hosts running on several machines implement `UIStore` on their database.
 
 ## Release Deliverables

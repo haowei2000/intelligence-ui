@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-// Real-browser check in headless Chrome or Firefox: the Playground, and the full cycle of a Python Agent,
+// Real-browser check in headless Chrome or Firefox, or in Safari: the Playground, and the full cycle of a Python Agent,
 // the service and the separately hosted frontend under its strict CSP. Also checks color contrast with
 // real layout in light and dark mode.
-// Usage: node scripts/browser-check.mjs [--browser chrome|firefox] [screenshot-dir]
+// Usage: node scripts/browser-check.mjs [--browser chrome|firefox|safari] [screenshot-dir]
 import http from 'node:http';
 import net from 'node:net';
 import { spawn, spawnSync } from 'node:child_process';
@@ -18,8 +18,8 @@ const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const args = process.argv.slice(2);
 const flag = args.indexOf('--browser');
 const browserName = flag === -1 ? 'chrome' : args.splice(flag, 2)[1];
-const drivers = { chrome: './cdp.mjs', firefox: './bidi.mjs' };
-if (!drivers[browserName]) { console.error(`unknown browser "${browserName}"; use chrome or firefox`); process.exit(2); }
+const drivers = { chrome: './cdp.mjs', firefox: './bidi.mjs', safari: './webdriver.mjs' };
+if (!drivers[browserName]) { console.error(`unknown browser "${browserName}"; use chrome, firefox or safari`); process.exit(2); }
 const { launch } = await import(drivers[browserName]);
 const shots = args[0];
 if (shots) await mkdir(shots, { recursive: true });
@@ -43,16 +43,26 @@ const playground = http.createServer(async (request, response) => { if (!(await 
 await listen(playground, playgroundPort);
 const agent = spawn(python, [path.join(root, 'examples/protocol/agent-python/agent.py'), '--service', serviceUrl, '--max-events', '1', '--poll', '0.2'], { stdio: 'ignore', env: { ...process.env, AI_BASE_URL: '' } });
 
-const browser = await launch();
+const browser = await launch().catch(error => {
+  agent.kill();
+  for (const server of [service, frontend, playground]) server.close();
+  console.error(`could not start ${browserName}: ${error.message}`);
+  process.exit(3);
+});
 const failures = [];
 const expect = (condition, message) => { if (!condition) failures.push(message); };
 const shot = async (name, width, height) => { if (shots) await browser.screenshot(path.join(shots, name), width, height); };
 // Ignore the example image host, which does not resolve by design (the card shows a text fallback).
-const errors = () => browser.logs.filter(line => !/ERR_NAME_NOT_RESOLVED/.test(line));
+const errors = async () => { await browser.collect?.(); return browser.logs.filter(line => !/ERR_NAME_NOT_RESOLVED/.test(line)); };
+// Safari cannot emulate the color scheme, so it is checked in the system appearance only.
+const schemes = async () => browser.colorScheme ? ['light', 'dark'] : [await browser.evaluate(`matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'`)];
+const notes = [];
 let card = `document.querySelector('#surface > div')?.shadowRoot`;
 try {
-  for (const scheme of ['light', 'dark']) {
-    await browser.colorScheme(scheme);
+  const playgroundSchemes = await schemes();
+  if (playgroundSchemes.length === 1) notes.push(`color contrast checked in ${playgroundSchemes[0]} mode only`);
+  for (const scheme of playgroundSchemes) {
+    await browser.colorScheme?.(scheme);
     await browser.goto(`http://localhost:${playgroundPort}/assets/playground/`);
     await browser.waitFor(`document.querySelector('#verdict').textContent === 'valid'`);
     await browser.evaluate(`document.querySelector('#publish').click()`);
@@ -71,7 +81,8 @@ try {
   await shot('playground-phone.png', 390, 844);
   expect(!(await browser.evaluate(`document.documentElement.scrollWidth > window.innerWidth`)), 'no horizontal scroll at phone width');
   await browser.resize(1280, 900);
-  expect(!errors().length, `playground console: ${errors().join(' | ')}`);
+  const playgroundErrors = await errors();
+  expect(!playgroundErrors.length, `playground console: ${playgroundErrors.join(' | ')}`);
   browser.logs.length = 0;
 
   card = `document.querySelector('#surface [data-document] > div')?.shadowRoot`;
@@ -83,19 +94,20 @@ try {
   await browser.waitFor(`${card}.querySelector('h3').textContent.includes('Paris')`, 20000);
   expect(await browser.evaluate(`${card}.querySelector('input[value=paris]').checked`), 'choice preserved in revision 2');
   await browser.waitFor(`${card}.querySelector('.status').textContent === 'Done.'`, 10000);
-  for (const scheme of ['light', 'dark']) {
-    await browser.colorScheme(scheme);
+  for (const scheme of await schemes()) {
+    await browser.colorScheme?.(scheme);
     await browser.evaluate(axe);
     const violations = await browser.evaluate(contrast);
     expect(!violations.length, `frontend contrast (${scheme}): ${violations.join(', ')}`);
     await shot(`frontend-revision-2-${scheme}.png`);
   }
-  expect(!errors().length, `frontend console: ${errors().join(' | ')}`);
+  const frontendErrors = await errors();
+  expect(!frontendErrors.length, `frontend console: ${frontendErrors.join(' | ')}`);
 } catch (error) {
   failures.push(`${error.message}${browser.logs.length ? ` (console: ${browser.logs.join(' | ')})` : ''}`);
 } finally {
-  browser.close(); agent.kill();
+  await browser.close(); agent.kill();
   for (const server of [service, frontend, playground]) { server.closeAllConnections(); server.close(); }
 }
 if (failures.length) { console.error(`browser check failed in ${browserName}:\n- ${failures.join('\n- ')}`); process.exit(1); }
-console.log(`browser check passed in ${browserName}${shots ? `; screenshots in ${shots}` : ''}`);
+console.log(`browser check passed in ${browserName}${notes.length ? ` (${notes.join('; ')})` : ''}${shots ? `; screenshots in ${shots}` : ''}`);
