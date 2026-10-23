@@ -99,6 +99,7 @@
     "check:types": "tsc -p tsconfig.types.json",
     "check:browser": "node scripts/browser-check.mjs",
     "check:browser:firefox": "node scripts/browser-check.mjs --browser firefox",
+    "check:browser:safari": "node scripts/browser-check.mjs --browser safari",
     "prepack": "npm run check:generated && npm run check:types && npm test"
   },
   "peerDependencies": {
