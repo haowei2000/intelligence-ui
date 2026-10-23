@@ -17,7 +17,7 @@
 
 非 JavaScript 项目可直接使用 `protocol/` 中的 JSON Schema、契约、生成说明和一致性用例，或调用 CLI（`intelligence-ui validate|fix|contract|serve|mcp`）、HTTP 与 MCP 服务。Agent Skill 位于 `skill/intelligence-ui`。
 
-文档（英文）：[快速上手](docs/quick-start.md) · [组件参考](docs/components.md) · [协议](docs/protocol.md) · [校验与自动修复](docs/autofix.md) · [部署](docs/deployment.md) · [安全](docs/security.md) · [迁移](docs/migration.md) · [实施计划](docs/implementation-plan.md)
+文档（英文）：[快速上手](docs/quick-start.md) · [API 参考](docs/api.md) · [组件参考](docs/components.md) · [协议](docs/protocol.md) · [校验与自动修复](docs/autofix.md) · [部署](docs/deployment.md) · [安全](docs/security.md) · [迁移](docs/migration.md) · [实施计划](docs/implementation-plan.md)
 
 ## 安装
 

@@ -10,7 +10,7 @@ const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const out = path.resolve(process.argv[2] || path.join(root, '_site'));
 const repo = 'https://github.com/haowei2000/intelligence-ui/blob/main';
 const docs = [
-  ['quick-start', 'Quick start'], ['components', 'Components'], ['protocol', 'Protocol'], ['autofix', 'Validation and Autofix'],
+  ['quick-start', 'Quick start'], ['api', 'API reference'], ['components', 'Components'], ['protocol', 'Protocol'], ['autofix', 'Validation and Autofix'],
   ['deployment', 'Deployment'], ['security', 'Security'], ['migration', 'Migration'], ['implementation-plan', 'Implementation plan'],
   ['experiments/structured-output', 'Structured output experiment']
 ];
@@ -24,6 +24,10 @@ function markedFor(docName) {
   const marked = new Marked();
   marked.use({
     renderer: {
+      // Wide code blocks and tables scroll sideways, so keyboard users must be able to focus them.
+      code({ text, lang }) {
+        return `<pre tabindex="0"><code${lang ? ` class="language-${escape(lang)}"` : ''}>${escape(text)}</code></pre>\n`;
+      },
       heading({ tokens, depth: level }) {
         const html = this.parser.parseInline(tokens);
         return `<h${level} id="${slug(html)}">${html}</h${level}>\n`;
@@ -60,7 +64,7 @@ function page({ title, body, toRoot, current }) {
 <body>
   <header class="top"><div class="top-inner">
     <a class="brand" href="${toRoot}">Intelligence UI</a>
-    <nav aria-label="Main"><a href="${toRoot}docs/quick-start.html"${current ? ' aria-current="page"' : ''}>Docs</a><a href="${toRoot}playground/">Playground</a><a href="${toRoot}protocol/">Protocol files</a><a href="https://github.com/haowei2000/intelligence-ui">GitHub</a></nav>
+    <nav aria-label="Main"><a href="${toRoot}docs/quick-start.html"${current && current !== 'api' ? ' aria-current="page"' : ''}>Docs</a><a href="${toRoot}docs/api.html"${current === 'api' ? ' aria-current="page"' : ''}>API</a><a href="${toRoot}playground/">Playground</a><a href="${toRoot}protocol/">Protocol files</a><a href="https://github.com/haowei2000/intelligence-ui">GitHub</a></nav>
   </div></header>
   <div class="layout">
     <nav class="sidebar" aria-label="Documentation"><h2>Docs</h2><ul>${nav}</ul></nav>
