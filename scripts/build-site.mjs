@@ -90,7 +90,7 @@ for (const [name, label] of docs) {
 for (const file of ['agent.mjs', 'protocol.mjs', 'runtime.mjs']) await cp(path.join(root, file), path.join(out, file));
 await mkdir(path.join(out, 'lib/runtime'), { recursive: true });
 await cp(path.join(root, 'lib/protocol'), path.join(out, 'lib/protocol'), { recursive: true });
-for (const file of ['mount.mjs', 'connect.mjs', 'styles.mjs']) await cp(path.join(root, 'lib/runtime', file), path.join(out, 'lib/runtime', file));
+for (const file of ['mount.mjs', 'connect.mjs', 'styles.mjs', 'chart.mjs']) await cp(path.join(root, 'lib/runtime', file), path.join(out, 'lib/runtime', file));
 await cp(path.join(root, 'playground'), path.join(out, 'playground'), { recursive: true });
 await cp(path.join(root, 'protocol'), path.join(out, 'protocol'), { recursive: true });
 

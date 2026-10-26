@@ -1,6 +1,6 @@
 # Interactive UI output (protocol 1.0)
 
-These instructions only cover producing an interactive UI document. Contract: `iui-9af53e234327ab00`.
+These instructions only cover producing an interactive UI document. Contract: `iui-49720ed330790d61`.
 
 ## Output
 
@@ -16,7 +16,8 @@ These instructions only cover producing an interactive UI document. Contract: `i
 - Text is displayed literally. Do not emit HTML, Markdown, CSS, scripts, or event handlers.
 - A Form submits the visible fields inside it to its `submitAction`. Put buttons with `{"type":"submit"}` or `{"type":"reset"}` inside a Form. Forms cannot nest.
 - `visibleWhen` shows a component only when a bound field matches: `{"bind":"field","op":"equals","value":"x"}`; ops: equals, notEquals (scalar value), in (array value), empty, notEmpty (no value). It must reference a bind key declared in the document.
-- Tables read rows from `datasets`: `{"datasets":{"name":{"rows":[{"field":"value"}]}}}`. Row values are strings, numbers, booleans or null.
+- Tables and charts read rows from `datasets`: `{"datasets":{"name":{"rows":[{"field":"value"}]}}}`. Row values are strings, numbers, booleans or null.
+- Chart: set kind (bar, line or pie), dataset, x (category field), series ([{field,label}]) and title. Every mapped field must exist in every row. Categories are strings or finite numbers; series values are finite numbers or null. Null means missing: lines break at nulls. Lines use equally spaced categories in row order. Pie requires exactly one series with nonnegative values. Bar/line support up to 8 unique series. Empty data is valid. Charts never call actions; full data is available in a disclosure table.
 - URLs are absolute. Images: https from any origin. Links: https/http/mailto from any origin. Web previews: https from any origin.
 - Limits: 500 components, depth 16, 1000 rows per dataset, 10000 characters per string, 262144 bytes in total.
 - Unsupported content types (raw HTML, Markdown, scripts, embedded applications) have no component. Express the content with the listed components or describe it in Text.
@@ -211,6 +212,22 @@ Shows rows from a dataset. Sorting is local.
 | sortable | boolean | no | Allow local sorting by column. default false |
 | caption | string | no | Table caption. |
 | emptyText | string | no | Shown when the dataset has no rows. |
+
+### Chart
+
+Accessible SVG bar, line or pie chart from a dataset. Charts are local displays and never call the host.
+
+| Property | Type | Required | Notes |
+| --- | --- | --- | --- |
+| kind | "bar" \| "line" \| "pie" | yes | Grouped bars, lines with gaps for null values, or pie slices. Pie requires exactly one series and nonnegative values. |
+| dataset | string | yes | Name of a dataset in the document. |
+| x | string | yes | Category field. Every row must contain a string or finite number. Rows keep dataset order; line points are equally spaced. |
+| series | object[] | yes | Unique numeric fields and their legend labels. Every mapped value must be a finite number or null. Null means missing, never zero. at least 1 items, at most 8 items, items: {field, label} |
+| title | string | yes | Visible heading and accessible chart name. |
+| description | string | no | Optional explanation below the heading. |
+| height | integer | no | Chart height in pixels; width adapts to the container. min 200, max 600 default 300 |
+| showLegend | boolean | no | Show series labels, or category labels for pie slices. Full data remains available in the data table. default true |
+| emptyText | string | no | Shown for empty or entirely null data, or a pie with no positive values. |
 
 ### WebPreview
 

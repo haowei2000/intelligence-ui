@@ -74,11 +74,18 @@ Field value types: Input stores `number` (or null) when `kind` is `number`, othe
 | `MISSING_PROPERTY` | A Button with action type `action` and no `actionId`. |
 | `FORM_WITHOUT_SUBMIT` (warning) | A Form with no submit Button. |
 | `DUPLICATE_TAB_ID` / `UNKNOWN_TAB` | Tab ids are unique within Tabs; `defaultTab` names one of them. |
-| `UNKNOWN_DATASET` | A Table names a dataset that does not exist. |
+| `UNKNOWN_DATASET` | A Table or Chart names a dataset that does not exist. |
 | `DUPLICATE_COLUMN` | Column fields are unique within a Table. |
 | `INVALID_DATASET_VALUE` | A `format: number` column has a value that is not a number or null. Report the first row. |
 | `MISSING_ROW_KEY` / `DUPLICATE_ROW_KEY` | With `rowKey`, every row has a non-null, unique value. Report the first problem. |
-| `UNUSED_DATASET` (warning) | A dataset no Table uses. |
+| `UNUSED_DATASET` (warning) | A dataset no Table or Chart uses. |
+
+Chart additionally applies these rules:
+
+- `DUPLICATE_SERIES`: series fields must be unique.
+- `INVALID_CHART_SERIES`: pie charts require exactly one series.
+- `INVALID_DATASET_VALUE`: every row must have the mapped category field (string or finite number) and each mapped series field (finite number or null). Pie values must be nonnegative. Report the first invalid row for each mapping. Missing fields are errors; null numeric values mean missing data.
+- Empty datasets are valid. Bar and line charts include zero in the numeric axis; negative values are supported. Lines use equally spaced categories in dataset order and break at nulls. Pie ignores null/zero slices and displays an empty state if there are no positive values. Values are never silently coerced or repaired.
 
 ## 6. Conditions
 

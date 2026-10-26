@@ -2086,6 +2086,372 @@
     "valid": true,
     "codes": []
    }
+  },
+  {
+   "name": "chart: valid grouped bars with negatives and nulls",
+   "input": {
+    "schemaVersion": "1.0",
+    "root": {
+     "type": "Chart",
+     "id": "chart",
+     "kind": "bar",
+     "title": "Sales",
+     "dataset": "sales",
+     "x": "month",
+     "series": [
+      {
+       "field": "value",
+       "label": "Revenue"
+      },
+      {
+       "field": "cost",
+       "label": "Cost"
+      }
+     ]
+    },
+    "datasets": {
+     "sales": {
+      "rows": [
+       {
+        "month": "Jan",
+        "value": -1,
+        "cost": 2
+       },
+       {
+        "month": "Feb",
+        "value": null,
+        "cost": 3
+       }
+      ]
+     }
+    }
+   },
+   "expect": {
+    "valid": true,
+    "codes": []
+   }
+  },
+  {
+   "name": "chart: valid line gaps",
+   "input": {
+    "schemaVersion": "1.0",
+    "root": {
+     "type": "Chart",
+     "id": "chart",
+     "kind": "line",
+     "title": "Sales",
+     "dataset": "sales",
+     "x": "month",
+     "series": [
+      {
+       "field": "value",
+       "label": "Revenue"
+      }
+     ]
+    },
+    "datasets": {
+     "sales": {
+      "rows": [
+       {
+        "month": "Jan",
+        "value": 1
+       },
+       {
+        "month": "Feb",
+        "value": null
+       },
+       {
+        "month": "Mar",
+        "value": 2
+       }
+      ]
+     }
+    }
+   },
+   "expect": {
+    "valid": true,
+    "codes": []
+   }
+  },
+  {
+   "name": "chart: valid empty pie",
+   "input": {
+    "schemaVersion": "1.0",
+    "root": {
+     "type": "Chart",
+     "id": "chart",
+     "kind": "pie",
+     "title": "Sales",
+     "dataset": "sales",
+     "x": "month",
+     "series": [
+      {
+       "field": "value",
+       "label": "Revenue"
+      }
+     ]
+    },
+    "datasets": {
+     "sales": {
+      "rows": []
+     }
+    }
+   },
+   "expect": {
+    "valid": true,
+    "codes": []
+   }
+  },
+  {
+   "name": "chart: unknown dataset",
+   "input": {
+    "schemaVersion": "1.0",
+    "root": {
+     "type": "Chart",
+     "id": "chart",
+     "kind": "bar",
+     "title": "Sales",
+     "dataset": "sales",
+     "x": "month",
+     "series": [
+      {
+       "field": "value",
+       "label": "Revenue"
+      }
+     ]
+    }
+   },
+   "expect": {
+    "valid": false,
+    "codes": [
+     "UNKNOWN_DATASET"
+    ]
+   }
+  },
+  {
+   "name": "chart: missing numeric field",
+   "input": {
+    "schemaVersion": "1.0",
+    "root": {
+     "type": "Chart",
+     "id": "chart",
+     "kind": "bar",
+     "title": "Sales",
+     "dataset": "sales",
+     "x": "month",
+     "series": [
+      {
+       "field": "value",
+       "label": "Revenue"
+      }
+     ]
+    },
+    "datasets": {
+     "sales": {
+      "rows": [
+       {
+        "month": "Jan"
+       }
+      ]
+     }
+    }
+   },
+   "expect": {
+    "valid": false,
+    "codes": [
+     "INVALID_DATASET_VALUE"
+    ]
+   }
+  },
+  {
+   "name": "chart: invalid category",
+   "input": {
+    "schemaVersion": "1.0",
+    "root": {
+     "type": "Chart",
+     "id": "chart",
+     "kind": "bar",
+     "title": "Sales",
+     "dataset": "sales",
+     "x": "month",
+     "series": [
+      {
+       "field": "value",
+       "label": "Revenue"
+      }
+     ]
+    },
+    "datasets": {
+     "sales": {
+      "rows": [
+       {
+        "month": false,
+        "value": 1
+       }
+      ]
+     }
+    }
+   },
+   "expect": {
+    "valid": false,
+    "codes": [
+     "INVALID_DATASET_VALUE"
+    ]
+   }
+  },
+  {
+   "name": "chart: numeric strings rejected",
+   "input": {
+    "schemaVersion": "1.0",
+    "root": {
+     "type": "Chart",
+     "id": "chart",
+     "kind": "bar",
+     "title": "Sales",
+     "dataset": "sales",
+     "x": "month",
+     "series": [
+      {
+       "field": "value",
+       "label": "Revenue"
+      }
+     ]
+    },
+    "datasets": {
+     "sales": {
+      "rows": [
+       {
+        "month": "Jan",
+        "value": "1"
+       }
+      ]
+     }
+    }
+   },
+   "expect": {
+    "valid": false,
+    "codes": [
+     "INVALID_DATASET_VALUE"
+    ]
+   }
+  },
+  {
+   "name": "chart: negative pie rejected",
+   "input": {
+    "schemaVersion": "1.0",
+    "root": {
+     "type": "Chart",
+     "id": "chart",
+     "kind": "pie",
+     "title": "Sales",
+     "dataset": "sales",
+     "x": "month",
+     "series": [
+      {
+       "field": "value",
+       "label": "Revenue"
+      }
+     ]
+    },
+    "datasets": {
+     "sales": {
+      "rows": [
+       {
+        "month": "Jan",
+        "value": -1
+       }
+      ]
+     }
+    }
+   },
+   "expect": {
+    "valid": false,
+    "codes": [
+     "INVALID_DATASET_VALUE"
+    ]
+   }
+  },
+  {
+   "name": "chart: pie requires one unique series",
+   "input": {
+    "schemaVersion": "1.0",
+    "root": {
+     "type": "Chart",
+     "id": "chart",
+     "kind": "pie",
+     "title": "Sales",
+     "dataset": "sales",
+     "x": "month",
+     "series": [
+      {
+       "field": "value",
+       "label": "Revenue"
+      },
+      {
+       "field": "value",
+       "label": "Again"
+      }
+     ]
+    },
+    "datasets": {
+     "sales": {
+      "rows": [
+       {
+        "month": "Jan",
+        "value": 1
+       }
+      ]
+     }
+    }
+   },
+   "expect": {
+    "valid": false,
+    "codes": [
+     "INVALID_CHART_SERIES",
+     "DUPLICATE_SERIES"
+    ]
+   }
+  },
+  {
+   "name": "chart: host can disable charts",
+   "input": {
+    "schemaVersion": "1.0",
+    "root": {
+     "type": "Chart",
+     "id": "chart",
+     "kind": "bar",
+     "title": "Sales",
+     "dataset": "sales",
+     "x": "month",
+     "series": [
+      {
+       "field": "value",
+       "label": "Revenue"
+      }
+     ]
+    },
+    "datasets": {
+     "sales": {
+      "rows": [
+       {
+        "month": "Jan",
+        "value": 1
+       }
+      ]
+     }
+    }
+   },
+   "expect": {
+    "valid": false,
+    "codes": [
+     "COMPONENT_UNAVAILABLE"
+    ]
+   },
+   "contract": {
+    "components": [
+     "Text"
+    ]
+   }
   }
  ]
 }

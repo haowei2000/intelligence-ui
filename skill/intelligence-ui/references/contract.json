@@ -1,5 +1,5 @@
 {
-  "id": "iui-9af53e234327ab00",
+  "id": "iui-49720ed330790d61",
   "contractVersion": 1,
   "profile": "standard",
   "protocolVersion": "1.0",
@@ -870,6 +870,109 @@
             "maxLength": 200
           },
           "description": "Shown when the dataset has no rows."
+        }
+      }
+    },
+    "Chart": {
+      "category": "data",
+      "description": "Accessible SVG bar, line or pie chart from a dataset. Charts are local displays and never call the host.",
+      "slots": [],
+      "props": {
+        "kind": {
+          "schema": {
+            "enum": [
+              "bar",
+              "line",
+              "pie"
+            ]
+          },
+          "required": true,
+          "description": "Grouped bars, lines with gaps for null values, or pie slices. Pie requires exactly one series and nonnegative values."
+        },
+        "dataset": {
+          "schema": {
+            "type": "string",
+            "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,63}$"
+          },
+          "required": true,
+          "description": "Name of a dataset in the document."
+        },
+        "x": {
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "required": true,
+          "description": "Category field. Every row must contain a string or finite number. Rows keep dataset order; line points are equally spaced."
+        },
+        "series": {
+          "schema": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 8,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field",
+                "label"
+              ],
+              "properties": {
+                "field": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64
+                },
+                "label": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                }
+              }
+            }
+          },
+          "required": true,
+          "description": "Unique numeric fields and their legend labels. Every mapped value must be a finite number or null. Null means missing, never zero."
+        },
+        "title": {
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "required": true,
+          "description": "Visible heading and accessible chart name."
+        },
+        "description": {
+          "schema": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "description": "Optional explanation below the heading."
+        },
+        "height": {
+          "schema": {
+            "type": "integer",
+            "minimum": 200,
+            "maximum": 600
+          },
+          "default": 300,
+          "description": "Chart height in pixels; width adapts to the container."
+        },
+        "showLegend": {
+          "schema": {
+            "type": "boolean"
+          },
+          "default": true,
+          "description": "Show series labels, or category labels for pie slices. Full data remains available in the data table."
+        },
+        "emptyText": {
+          "schema": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "description": "Shown for empty or entirely null data, or a pie with no positive values."
         }
       }
     },

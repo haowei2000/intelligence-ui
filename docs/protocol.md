@@ -34,7 +34,7 @@ The host turns a valid candidate into a **committed document** by adding identit
 
 ## Components
 
-17 standard components; see the generated [component reference](components.md).
+18 standard components; see the generated [component reference](components.md).
 
 | Category | Components |
 | --- | --- |
@@ -43,10 +43,10 @@ The host turns a valid candidate into a **committed document** by adding identit
 | Input | Input, Choice, Toggle, Slider |
 | Forms and actions | Form, Button |
 | Organization | Tabs, Disclosure |
-| Data | Table |
+| Data | Table, Chart |
 | External | WebPreview |
 
-Every component has `type`, a document-unique `id`, and optional `visibleWhen`. Chart is planned as the 18th component.
+Every component has `type`, a document-unique `id`, and optional `visibleWhen`. Chart supports bar, line and pie presentations with dataset mappings, SVG output and an accessible data table.
 
 Hosts may register namespaced extensions (`acme:Map`) with `createContract({ extensions })`, validate them with `compileExtensions(contract)` and render them with `mountUI({ renderers })`. An extension is only usable when all three are present.
 

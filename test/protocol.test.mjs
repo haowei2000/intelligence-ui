@@ -26,7 +26,7 @@ test('static contract file equals the standard profile and has a stable identity
   assert.equal(createContract().id, standardContract().id);
   assert.notEqual(createContract({ actions: ['a'] }).id, standardContract().id);
   assert.equal(createContract({ actions: ['a', 'b'] }).id, createContract({ actions: ['a', 'b'] }).id);
-  assert.equal(Object.keys(standardContract().components).length, 17);
+  assert.equal(Object.keys(standardContract().components).length, 18);
   assert.equal(standardContract().actions, null);
   assert.ok(Object.isFrozen(standardContract().policy.urls.image));
 });
@@ -90,7 +90,7 @@ test('every component has an example in the catalog that validates', async () =>
   for (const [type, spec] of Object.entries(catalog.components)) {
     const example = structuredClone(spec.example);
     const wrapped = ['Button'].includes(type) && example.action?.type !== 'action' ? { type: 'Form', id: 'wrap', submitAction: 'a', children: [example] } : example;
-    const result = validate(doc(wrapped, type === 'Table' ? { datasets: { hotels: { rows: [{ name: 'A', price: 1 }] } } } : {}));
+    const result = validate(doc(wrapped, type === 'Table' ? { datasets: { hotels: { rows: [{ name: 'A', price: 1 }] } } } : type === 'Chart' ? { datasets: { sales: { rows: [{ month: 'Jan', revenue: 10 }] } } } : {}));
     assert.ok(result.valid, `${type}: ${JSON.stringify(result.diagnostics)}`);
   }
 });

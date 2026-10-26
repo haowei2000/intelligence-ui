@@ -28,3 +28,13 @@ const service = createUIService({ contract, store: new MemoryUIStore(), authenti
 createMCPHandler({ service, principal: { id: 'agent', roles: ['agent'], surfaces: ['*'] } });
 // @ts-expect-error a contract is required
 createUIService({ authenticate: () => null });
+
+const chartDocument: UIDocument = {
+  schemaVersion: '1.0',
+  root: { type: 'Chart', id: 'sales', kind: 'line', dataset: 'sales', x: 'month', title: 'Sales', series: [{ field: 'value', label: 'Revenue' }], height: 300, showLegend: true },
+  datasets: { sales: { rows: [{ month: 'Jan', value: 10 }] } }
+};
+commitDocument(chartDocument, { id: 'chart', revision: 1 });
+// @ts-expect-error unsupported chart family
+const unsupportedChart: UIDocument['root'] = { ...chartDocument.root, type: 'Chart', kind: 'scatter' };
+unsupportedChart;

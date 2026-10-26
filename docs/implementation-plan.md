@@ -25,7 +25,7 @@ The first release must deliver a working generation, validation, rendering, inte
 
 The first release will not require a hosted model gateway, a proprietary backend service, or a complete replacement chat application. It will not execute arbitrary model generated JavaScript in the standard component renderer.
 
-Executable applications, represented by a future AppBlock capability, require a separate sandbox design and are outside the first release. Charts, MCP Apps presentation, the container image, and Go and Java examples follow in a later release. Visual editors, extensive domain specific component libraries, native mobile renderers, and full SDKs for every backend language are also deferred.
+Executable applications, represented by a future AppBlock capability, require a separate sandbox design and are outside the first release. MCP Apps presentation, the container image, and Go and Java examples follow in a later release. Visual editors, extensive domain specific component libraries, native mobile renderers, and full SDKs for every backend language are also deferred.
 
 Streaming is an enhancement to the document delivery protocol. The initial release may publish complete document snapshots. It must not depend on rendering malformed partial JSON or executing incomplete programs.
 
@@ -55,7 +55,7 @@ Package `0.3.0` implements P0 through P4 except the items marked open. Run `npm 
 | --- | --- | --- |
 | P0 | `components.json` source of truth; generated schemas, types, precompiled validators, contract, instructions and component reference; diagnostic, repair and version formats; examples; conformance cases; semantic rules | `protocol/`, `scripts/generate.mjs`, `docs/protocol.md` |
 | P1 | Parser, structural, semantic, capability and policy validation; bounded diagnostics; deterministic Autofix; bounded model repair loop; Raw contract export; CLI with documented exit codes | `lib/protocol/`, `agent.mjs`, `lib/cli.mjs`, `docs/autofix.md` |
-| P2 | 17 components; uncontrolled browser runtime; React wrapper; form scope and typed submission; host actions with status; three-way merge with every table row tested; WebPreview with policy sandbox; axe-core audit of every component | `lib/runtime/`, `test/runtime.test.mjs`, `test/accessibility.test.mjs` |
+| P2 | 18 components (including Chart); uncontrolled browser runtime; React wrapper; form scope and typed submission; host actions with status; three-way merge with every table row tested; WebPreview with policy sandbox; axe-core audit of every component | `lib/runtime/`, `test/runtime.test.mjs`, `test/accessibility.test.mjs` |
 | P3 | HTTP delivery service with SSE, event re-validation, deduplication, cursor event log, state saves; MCP over stdio and stateless HTTP, tested with the official SDK client; Agent Skill; TypeScript and Python Agents; separately hosted frontend; automated Python round trip | `lib/service/`, `skill/intelligence-ui/`, `examples/protocol/`, `test/e2e.test.mjs` |
 | P4 | Quick start, protocol, Autofix, deployment, security and migration guides; Playground; export and packaging checks; clean install verified from the packed tarball; Chrome, Firefox and Safari checks; SQLite store | `docs/`, `playground/`, `test/package.test.mjs`, `scripts/browser-check.mjs`, `lib/service/sqlite-store.mjs` |
 
@@ -103,7 +103,7 @@ Keep one core package with separate import entries so applications only load the
 | `@haowei2000/intelligence-ui/runtime/react` | React component renderer and lifecycle integration |
 | `@haowei2000/intelligence-ui/node` | Optional HTTP, persistence, Studio, and service helpers |
 
-The existing root, `browser`, `react`, and `document` entries keep serving the legacy InteractiveDocument renderer unchanged; the component protocol uses the new entries above rather than repurposing them. The runtime entries must not import filesystem APIs, server code, model providers, or a schema compiler; they use precompiled validators. Optional component code, such as a later Chart implementation, must be isolated so simple forms do not load it.
+The existing root, `browser`, `react`, and `document` entries keep serving the legacy InteractiveDocument renderer unchanged; the component protocol uses the new entries above rather than repurposing them. The runtime entries must not import filesystem APIs, server code, model providers, or a schema compiler; they use precompiled validators. Chart geometry is isolated in a dependency-free SVG renderer; the standard runtime includes it without a third-party chart library.
 
 ### CLI
 
@@ -292,10 +292,10 @@ Keep Toggle distinct from Choice because it represents a boolean. Keep Link dist
 | Input | Input, Choice, Toggle, Slider | Typed bindings, constraints, single or multiple selection, boolean values, and numeric ranges |
 | Forms and actions | Form, Button | Submission scope, validation feedback, explicit actions, and pending states |
 | Content organization | Tabs, Disclosure | Keyboard navigation, local selection, and expansion state |
-| Data display | Table | Dataset references, consistent field mapping, and useful empty states |
+| Data display | Table, Chart | Dataset references, validated numeric mappings, accessible chart data tables, and useful empty states |
 | External content | WebPreview | Controlled iframe embedding and an available open original link |
 
-The first release catalog contains 17 component types. Chart is planned as the 18th once its contract and isolated renderer are ready. Every standard component must have at least one valid example, invalid examples, a renderer implementation, and an accessibility check before being advertised by the standard runtime profile.
+The current catalog contains 18 component types, including Chart with an isolated SVG renderer. Every standard component must have at least one valid example, invalid examples, a renderer implementation, and an accessibility check before being advertised by the standard runtime profile.
 
 ### Component Specific Constraints
 
@@ -305,7 +305,7 @@ The first release catalog contains 17 component types. Chart is planned as the 1
 - Form must define which fields it submits. Nested forms are invalid. Submit and reset buttons must resolve to a form.
 - Button must reference a declared host action or an explicitly supported local operation. It cannot contain executable handlers.
 - Table must define columns, stable row identity where required, and dataset shape. Sorting and selection must have explicit local or host behavior.
-- Chart (later release) initially supports line, bar, and pie presentations. Dataset mappings and numeric requirements must be checked before publication. Additional chart families remain extensions until their contracts are defined.
+- Chart supports line, bar, and pie presentations. Dataset mappings and numeric requirements must be checked before publication. Additional chart families remain extensions until their contracts are defined.
 - Tabs must define unique tab IDs and an active tab that exists. Disclosure must have a usable accessible label.
 - Image, Link, and WebPreview must apply host URL policy. Resource availability remains a runtime concern.
 
@@ -589,7 +589,7 @@ The first integrated release must demonstrate:
 | Exact public API and executable names | Preserve legacy entry points and expose a small set of new integration entries |
 | Binding and condition syntax | Prefer explicit flat bindings and restricted declarative conditions |
 | Model schema compatibility | Decided by the P0 structured output experiment: canonical recursive schema with adapters, or a flat ID referenced component list |
-| Chart implementation | Deferred from the first release; when added, keep rendering code isolated and advertise only loaded capabilities |
+| Chart implementation | Implemented: isolated SVG renderer for bar, line and pie; included in the standard profile, or disabled through the host contract |
 | Service deployment | Support embedding in an existing backend and standalone service deployment |
 | Incremental delivery | Start with complete snapshots; add validated batches or patches after the baseline is reliable |
 | Native language SDKs | Begin with Raw artifacts and examples; add SDKs in response to demonstrated integration needs |
