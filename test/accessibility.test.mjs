@@ -37,7 +37,7 @@ test('axe finds no violations in each component example, and every component is 
   for (const [type, spec] of Object.entries(catalog.components)) {
     const example = structuredClone(spec.example);
     const root = type === 'Button' && example.action?.type !== 'action' ? { type: 'Form', id: 'wrap', submitAction: 'a', children: [example] } : example;
-    await clean(type, { schemaVersion: '1.0', root, ...(type === 'Table' ? { datasets: { hotels: { rows: [{ name: 'A', price: 1 }] } } } : {}) });
+    await clean(type, { schemaVersion: '1.0', root, ...(type === 'Table' ? { datasets: { hotels: { rows: [{ name: 'A', price: 1 }] } } } : type === 'Chart' ? { datasets: { sales: { rows: [{ month: 'Jan', revenue: 10 }] } } } : {}) });
     covered.add(type);
   }
   for (const [, candidate] of examples) JSON.stringify(candidate, (key, value) => { if (key === 'type' && catalog.components[value]) covered.add(value); return value; });

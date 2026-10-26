@@ -1,0 +1,104 @@
+{
+  "schemaVersion": "1.0",
+  "title": "Sales overview",
+  "root": {
+    "type": "Stack",
+    "id": "dashboard",
+    "children": [
+      {
+        "type": "Chart",
+        "id": "revenue-bars",
+        "kind": "bar",
+        "dataset": "sales",
+        "x": "month",
+        "series": [
+          {
+            "field": "revenue",
+            "label": "Revenue"
+          },
+          {
+            "field": "cost",
+            "label": "Cost"
+          }
+        ],
+        "title": "Revenue and cost",
+        "description": "Monthly totals in EUR."
+      },
+      {
+        "type": "Chart",
+        "id": "revenue-line",
+        "kind": "line",
+        "dataset": "sales",
+        "x": "month",
+        "series": [
+          {
+            "field": "revenue",
+            "label": "Revenue"
+          },
+          {
+            "field": "cost",
+            "label": "Cost"
+          }
+        ],
+        "title": "Monthly trend",
+        "description": "Missing cost data in March creates a gap."
+      },
+      {
+        "type": "Chart",
+        "id": "channel-pie",
+        "kind": "pie",
+        "dataset": "channels",
+        "x": "channel",
+        "series": [
+          {
+            "field": "revenue",
+            "label": "Revenue"
+          }
+        ],
+        "title": "Revenue by channel"
+      }
+    ]
+  },
+  "datasets": {
+    "sales": {
+      "rows": [
+        {
+          "month": "Jan",
+          "revenue": 12000,
+          "cost": 8000
+        },
+        {
+          "month": "Feb",
+          "revenue": 16000,
+          "cost": 10000
+        },
+        {
+          "month": "Mar",
+          "revenue": 14000,
+          "cost": null
+        },
+        {
+          "month": "Apr",
+          "revenue": 19000,
+          "cost": 11000
+        }
+      ]
+    },
+    "channels": {
+      "rows": [
+        {
+          "channel": "Online",
+          "revenue": 42000
+        },
+        {
+          "channel": "Retail",
+          "revenue": 15000
+        },
+        {
+          "channel": "Partners",
+          "revenue": 4000
+        }
+      ]
+    }
+  }
+}

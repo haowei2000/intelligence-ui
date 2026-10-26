@@ -20,6 +20,7 @@ Generated from `protocol/components.json` (protocol 1.0). Every component also a
 | [Tabs](#tabs) | organization | Switches between panels locally. Tab switching never calls the host. |
 | [Disclosure](#disclosure) | organization | Content that the user can expand and collapse locally. |
 | [Table](#table) | data | Shows rows from a dataset. Sorting is local. |
+| [Chart](#chart) | data | Accessible SVG bar, line or pie chart from a dataset. Charts are local displays and never call the host. |
 | [WebPreview](#webpreview) | external | Embeds an external page in a sandboxed frame with an open original link. Sites may refuse embedding; the link always remains. |
 
 ## Stack
@@ -417,6 +418,39 @@ Shows rows from a dataset. Sorting is local.
       "format": "number"
     }
   ]
+}
+```
+
+## Chart
+
+Accessible SVG bar, line or pie chart from a dataset. Charts are local displays and never call the host.
+
+| Property | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `kind` | `"bar" \| "line" \| "pie"` | yes |  | Grouped bars, lines with gaps for null values, or pie slices. Pie requires exactly one series and nonnegative values. |
+| `dataset` | `string` | yes |  | Name of a dataset in the document. |
+| `x` | `string` | yes |  | Category field. Every row must contain a string or finite number. Rows keep dataset order; line points are equally spaced. |
+| `series` | `Array<{ field: string; label: string }>` | yes |  | Unique numeric fields and their legend labels. Every mapped value must be a finite number or null. Null means missing, never zero. |
+| `title` | `string` | yes |  | Visible heading and accessible chart name. |
+| `description` | `string` | no |  | Optional explanation below the heading. |
+| `height` | `number` | no | `300` | Chart height in pixels; width adapts to the container. |
+| `showLegend` | `boolean` | no | `true` | Show series labels, or category labels for pie slices. Full data remains available in the data table. |
+| `emptyText` | `string` | no |  | Shown for empty or entirely null data, or a pie with no positive values. |
+
+```json
+{
+  "type": "Chart",
+  "id": "sales-chart",
+  "kind": "bar",
+  "dataset": "sales",
+  "x": "month",
+  "series": [
+    {
+      "field": "revenue",
+      "label": "Revenue"
+    }
+  ],
+  "title": "Monthly revenue"
 }
 ```
 

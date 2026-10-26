@@ -209,6 +209,28 @@ export interface TableComponent extends ComponentBase {
   /** Shown when the dataset has no rows. */
   emptyText?: string;
 }
+/** Accessible SVG bar, line or pie chart from a dataset. Charts are local displays and never call the host. */
+export interface ChartComponent extends ComponentBase {
+  type: 'Chart';
+  /** Grouped bars, lines with gaps for null values, or pie slices. Pie requires exactly one series and nonnegative values. */
+  kind: "bar" | "line" | "pie";
+  /** Name of a dataset in the document. */
+  dataset: string;
+  /** Category field. Every row must contain a string or finite number. Rows keep dataset order; line points are equally spaced. */
+  x: string;
+  /** Unique numeric fields and their legend labels. Every mapped value must be a finite number or null. Null means missing, never zero. */
+  series: Array<{ field: string; label: string }>;
+  /** Visible heading and accessible chart name. */
+  title: string;
+  /** Optional explanation below the heading. */
+  description?: string;
+  /** Chart height in pixels; width adapts to the container. Default: 300. */
+  height?: number;
+  /** Show series labels, or category labels for pie slices. Full data remains available in the data table. Default: true. */
+  showLegend?: boolean;
+  /** Shown for empty or entirely null data, or a pie with no positive values. */
+  emptyText?: string;
+}
 /** Embeds an external page in a sandboxed frame with an open original link. Sites may refuse embedding; the link always remains. */
 export interface WebPreviewComponent extends ComponentBase {
   type: 'WebPreview';
@@ -219,7 +241,7 @@ export interface WebPreviewComponent extends ComponentBase {
   /** Frame height in pixels. Default: 480. */
   height?: number;
 }
-export type StandardComponentType = 'Stack' | 'Grid' | 'Card' | 'Divider' | 'Text' | 'Image' | 'Link' | 'Input' | 'Choice' | 'Toggle' | 'Slider' | 'Form' | 'Button' | 'Tabs' | 'Disclosure' | 'Table' | 'WebPreview';
-export type Component = StackComponent | GridComponent | CardComponent | DividerComponent | TextComponent | ImageComponent | LinkComponent | InputComponent | ChoiceComponent | ToggleComponent | SliderComponent | FormComponent | ButtonComponent | TabsComponent | DisclosureComponent | TableComponent | WebPreviewComponent;
+export type StandardComponentType = 'Stack' | 'Grid' | 'Card' | 'Divider' | 'Text' | 'Image' | 'Link' | 'Input' | 'Choice' | 'Toggle' | 'Slider' | 'Form' | 'Button' | 'Tabs' | 'Disclosure' | 'Table' | 'Chart' | 'WebPreview';
+export type Component = StackComponent | GridComponent | CardComponent | DividerComponent | TextComponent | ImageComponent | LinkComponent | InputComponent | ChoiceComponent | ToggleComponent | SliderComponent | FormComponent | ButtonComponent | TabsComponent | DisclosureComponent | TableComponent | ChartComponent | WebPreviewComponent;
 export interface Dataset { rows: Array<Record<string, string | number | boolean | null>>; }
 export interface UIDocument { schemaVersion: string; title?: string; root: Component; datasets?: Record<string, Dataset>; }

@@ -8,6 +8,25 @@
 
 0.3 新增一套与语言无关的组件协议：Agent 输出 JSON 组件树，宿主在发布前校验与自动修复，浏览器渲染卡片，并把结构化的用户操作交回宿主。原有的 InteractiveDocument 入口保持不变。
 
+当前提供 18 种标准组件，包括 **Chart 图表**：柱状图、折线图、饼图。图表复用 datasets，支持多系列柱状图/折线图、图例、数据提示和可访问的数据表，使用 SVG 渲染，无需额外图表依赖。完整示例见 [charts.json](protocol/examples/charts.json)，也可在 Playground 选择 Charts。
+
+```js
+const chartDocument = {
+  schemaVersion: '1.0',
+  root: {
+    type: 'Chart', id: 'sales-chart', kind: 'bar', title: '月度收入',
+    dataset: 'sales', x: 'month',
+    series: [{ field: 'revenue', label: '收入' }],
+  },
+  datasets: { sales: { rows: [
+    { month: '一月', revenue: 12000 },
+    { month: '二月', revenue: 16000 },
+  ] } },
+};
+```
+
+与其他组件文档一样，通过 `commitDocument` 后交给 `mountUI` 或 React 的 `UIRenderer` 渲染。折线图按数据行顺序等距绘制，`null` 表示缺失并断开连线；饼图仅接受一个非负数系列。
+
 | 入口 | 用途 |
 | --- | --- |
 | `@haowei2000/intelligence-ui/protocol` | 契约、状态合并、宿主侧事件与状态校验 |

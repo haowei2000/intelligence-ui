@@ -81,6 +81,26 @@ try {
   await shot('playground-phone.png', 390, 844);
   expect(!(await browser.evaluate(`document.documentElement.scrollWidth > window.innerWidth`)), 'no horizontal scroll at phone width');
   await browser.resize(1280, 900);
+  // All Chart families use the served SVG module and remain usable at phone width.
+  await browser.evaluate(`(() => { const select = document.querySelector('#example'); select.value = 'charts'; select.dispatchEvent(new Event('change')); })()`);
+  await browser.waitFor(`document.querySelector('#document').value.includes('revenue-bars')`);
+  await browser.evaluate(`document.querySelector('#publish').click()`);
+  await browser.waitFor(`${card}?.querySelectorAll('.chart svg').length === 3`);
+  expect(await browser.evaluate(`${card}.querySelectorAll('svg rect').length === 7`), 'chart grouped bars omit null values');
+  await browser.evaluate(`${card}.querySelector('.chart-data summary').click()`);
+  expect(await browser.evaluate(`${card}.querySelector('.chart-data').open`), 'chart data table opens');
+  for (const scheme of playgroundSchemes) {
+    await browser.colorScheme?.(scheme);
+    await browser.evaluate(axe);
+    const violations = await browser.evaluate(contrast);
+    expect(!violations.length, `charts contrast (${scheme}): ${violations.join(', ')}`);
+  }
+  await shot('charts.png');
+  await shot('charts-phone.png', 390, 844);
+  await browser.resize(390, 844);
+  expect(!(await browser.evaluate(`document.documentElement.scrollWidth > window.innerWidth`)), 'charts have no page overflow at phone width');
+  expect(await browser.evaluate(`Array.from(${card}.querySelectorAll('svg')).every(svg => { const r = svg.getBoundingClientRect(); return r.width > 0 && r.right <= window.innerWidth; })`), 'chart graphics fit the phone viewport');
+  await browser.resize(1280, 900);
   const playgroundErrors = await errors();
   expect(!playgroundErrors.length, `playground console: ${playgroundErrors.join(' | ')}`);
   browser.logs.length = 0;
